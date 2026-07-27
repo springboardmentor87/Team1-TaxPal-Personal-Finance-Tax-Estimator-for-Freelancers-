@@ -19,11 +19,7 @@ The project aims to simplify financial management by providing an intuitive dash
 
 ### Frontend
 - Angular
-- TypeScript
-- HTML5
-- CSS3
-- Bootstrap
-
+  
 ### Backend
 - Node.js
 - Express.js
