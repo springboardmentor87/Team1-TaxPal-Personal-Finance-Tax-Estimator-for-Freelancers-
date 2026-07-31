@@ -1,8 +1,14 @@
 const transactionValidation = (req, res, next) => {
 
-    const { type, category, amount, date } = req.body;
+    const {
+        title,
+        amount,
+        type,
+        category,
+        transaction_date
+    } = req.body;
 
-    if (!type || !category || !amount || !date) {
+    if (!title || !amount || !type || !category || !transaction_date) {
         return res.status(400).json({
             message: "All fields are required"
         });
@@ -10,6 +16,6 @@ const transactionValidation = (req, res, next) => {
 
     next();
 
-}
+};
 
 module.exports = transactionValidation;

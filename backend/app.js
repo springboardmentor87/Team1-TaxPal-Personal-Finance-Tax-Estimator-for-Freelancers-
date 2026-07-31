@@ -1,4 +1,5 @@
 const express = require("express");
+const db = require("./config/db");
 const app = express();
 const authRoutes = require("./routes/transactionRoute");
 const cors = require("cors");
