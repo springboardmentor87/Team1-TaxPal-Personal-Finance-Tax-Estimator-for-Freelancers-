@@ -70,4 +70,3 @@ npm run build
 To execute the unit test suite using Vitest:
 ```bash
 npm test
-```
