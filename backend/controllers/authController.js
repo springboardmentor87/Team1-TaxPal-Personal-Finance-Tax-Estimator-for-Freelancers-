@@ -5,7 +5,7 @@ const registerUser = async (req, res) => {
     console.log("Controller Layer - Register");
     try {
         const { name, email, password } = req.body;
-        
+
         // Basic validation in controller
         if (!name || !email || !password) {
             return res.status(400).json({
