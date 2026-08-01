@@ -1,20 +1,29 @@
-CREATE DATABASE IF NOT EXISTS sathwika;
-USE sathwika;
+CREATE DATABASE IF NOT EXISTS taxpal;
+USE taxpal;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    ADD COLUMN country VARCHAR(100) NOT NULL,
+    ADD COLUMN income_bracket VARCHAR(50) NOT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS transactions (
+
+CREATE TABLE transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    type VARCHAR(50) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    type ENUM('Income','Expense') NOT NULL,
     category VARCHAR(100) NOT NULL,
     transaction_date DATE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_transaction_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
 );

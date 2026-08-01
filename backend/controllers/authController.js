@@ -4,17 +4,22 @@ const authService = require("../services/authService");
 const registerUser = async (req, res) => {
     console.log("Controller Layer - Register");
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, country, income_bracket } = req.body;
 
-        // Basic validation in controller
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !country || !income_bracket) {
             return res.status(400).json({
                 success: false,
-                message: "Name, email and password are required"
+                message: "All fields are required"
             });
         }
 
-        const result = await authService.register({ name, email, password });
+        const result = await authService.register({
+            name,
+            email,
+            password,
+            country,
+            income_bracket
+        });
         return res.status(201).json({
             success: true,
             message: "User registered successfully",

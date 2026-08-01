@@ -7,72 +7,89 @@ const JWT_EXPIRES_IN = "24h";
 
 // Register Service
 const register = async (userData) => {
-    const { name, email, password } = userData;
+
+    const {
+        name,
+        email,
+        password,
+        country,
+        income_bracket
+    } = userData;
 
     // Validate fields
-    if (!name || !email || !password) {
-        throw new Error("Name, email and password are required");
+    if (!name || !email || !password || !country || !income_bracket) {
+        throw new Error("All fields are required");
     }
 
     // Check if user already exists
     const existingUser = await UserModel.findByEmail(email);
+
     if (existingUser) {
         throw new Error("Email already registered");
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save to DB
+    // Save user
     const newUser = await UserModel.createUser({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        country,
+        income_bracket
     });
 
     return {
         id: newUser.id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        country: newUser.country,
+        income_bracket: newUser.income_bracket
     };
 };
 
 // Login Service
 const login = async (loginData) => {
+
     const { email, password } = loginData;
 
-    // Validate fields
     if (!email || !password) {
         throw new Error("Email and password are required");
     }
 
-    // Find user
     const user = await UserModel.findByEmail(email);
+
     if (!user) {
         throw new Error("Invalid email or password");
     }
 
-    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
         throw new Error("Invalid email or password");
     }
 
-    // Generate JWT
     const token = jwt.sign(
-        { id: user.id, name: user.name, email: user.email },
+        {
+            id: user.id,
+            name: user.name,
+            email: user.email
+        },
         JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN }
+        {
+            expiresIn: JWT_EXPIRES_IN
+        }
     );
 
-    // Return token and user info (excluding password)
     return {
         token,
         user: {
             id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            country: user.country,
+            income_bracket: user.income_bracket
         }
     };
 };
