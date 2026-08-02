@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Colors */
-  --bg-primary: #f8fafc;
+  /* Curated Fintech Palette */
+  --bg-primary: #f1f5f9;
   --bg-secondary: #ffffff;
   --bg-dark: #0f172a;
   
@@ -11,29 +11,32 @@
   --text-light: #94a3b8;
   --text-dark-bg: #f8fafc;
   
-  --primary: #0ea5e9;
-  --primary-hover: #0284c7;
-  --primary-light: #e0f2fe;
+  /* Primary Indigo / Electric Violet Accent */
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #eeef2;
   
+  /* Vibrant Mint Emerald Income */
   --income: #10b981;
   --income-hover: #059669;
-  --income-light: #d1fae5;
+  --income-light: #ecfdf5;
   
+  /* Crimson Rose Expense */
   --expense: #f43f5e;
   --expense-hover: #e11d48;
-  --expense-light: #ffe4e6;
+  --expense-light: #fff1f2;
 
-  --accent-orange: #f59e0b;
-  --accent-orange-light: #fef3c7;
+  --accent-amber: #f59e0b;
+  --accent-amber-light: #fef3c7;
 
   --border: #e2e8f0;
-  --border-focus: #38bdf8;
+  --border-focus: #818cf8;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 15px rgba(14, 165, 233, 0.15);
+  /* Premium Shadows & Glass Glow */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
 
   /* Radius */
   --radius-sm: 8px;
@@ -42,7 +45,7 @@
   --radius-full: 9999px;
 
   /* Font */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
@@ -60,20 +63,46 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animations */
+/* Micro-Animations & Dynamic Transitions */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.93); }
   to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(14, 165, 233, 0); }
+  50% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.35); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes springBounce {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 /* Scrollbar Customization */
@@ -99,12 +128,33 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.1), 0 6px 12px -3px rgba(15, 23, 42, 0.05);
+  transform: translateY(-4px);
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+/* Card Shine Accent on Hover */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.card:hover::after {
+  left: 150%;
 }
 
 /* Form Styles */
@@ -131,12 +181,13 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18);
+  transform: translateY(-1px);
 }
 
 .form-input::placeholder {
@@ -157,7 +208,7 @@ body {
   resize: vertical;
 }
 
-/* Buttons */
+/* Buttons with Dynamic Press & Ripple Animations */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -169,23 +220,27 @@ body {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.96) translateY(1px);
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
   color: white;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #0369a1 100%);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-secondary {
@@ -197,26 +252,32 @@ body {
 .btn-secondary:hover {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
 }
 
 .btn-income {
-  background-color: var(--income);
+  background: linear-gradient(135deg, var(--income) 0%, var(--income-hover) 100%);
   color: white;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
 .btn-income:hover {
-  background-color: var(--income-hover);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, var(--income-hover) 0%, #047857 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-expense {
-  background-color: var(--expense);
+  background: linear-gradient(135deg, var(--expense) 0%, var(--expense-hover) 100%);
   color: white;
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.25);
 }
 
 .btn-expense:hover {
-  background-color: var(--expense-hover);
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+  background: linear-gradient(135deg, var(--expense-hover) 0%, #be123c 100%);
+  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-icon-only {
@@ -325,6 +386,37 @@ body {
 .badge-expense {
   background-color: var(--expense-light);
   color: var(--expense-hover);
+}
+
+/* Global Alert Banners */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.alert svg {
+  flex-shrink: 0;
+}
+
+.alert-error {
+  background-color: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);
+}
+
+.alert-success {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 }
 
 /* Utilities */

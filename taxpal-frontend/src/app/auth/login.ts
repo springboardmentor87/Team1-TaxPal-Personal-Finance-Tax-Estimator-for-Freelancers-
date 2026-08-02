@@ -1,13 +1,13 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
   template: `
     <div class="auth-page">
       <div class="auth-wrapper">
@@ -134,7 +134,7 @@ import { AuthService } from './auth.service';
               <div class="form-group">
                 <div class="password-label-wrapper">
                   <label class="form-label" for="password">Password</label>
-                  <a href="#" class="forgot-password" (click)="$event.preventDefault()">Forgot password?</a>
+                  <a href="#" class="forgot-password" (click)="openForgotPassword($event)">Forgot password?</a>
                 </div>
                 <div class="input-wrapper">
                   <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -180,6 +180,36 @@ import { AuthService } from './auth.service';
           </div>
         </div>
       </div>
+
+      <!-- Forgot Password Modal Dialog -->
+      <div class="modal-overlay" *ngIf="showForgotModal()">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3 class="modal-title">Reset Password</h3>
+            <button class="modal-close" (click)="closeForgotPassword()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+              Enter your registered email address below and we'll send you a password reset link.
+            </p>
+            <div *ngIf="forgotSuccess()" class="alert alert-success">
+              <span>A password reset link has been sent to your email address.</span>
+            </div>
+            <div class="form-group" *ngIf="!forgotSuccess()">
+              <label class="form-label" for="resetEmail">Email Address</label>
+              <input type="email" id="resetEmail" [(ngModel)]="resetEmail" class="form-input" placeholder="e.g. alex@example.com">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeForgotPassword()">Close</button>
+            <button class="btn btn-primary" *ngIf="!forgotSuccess()" (click)="submitForgotPassword()" [disabled]="!resetEmail">Send Reset Link</button>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -209,7 +239,7 @@ import { AuthService } from './auth.service';
     /* Left Hero Panel */
     .auth-hero {
       flex: 1.1;
-      background: linear-gradient(145deg, #0284c7 0%, #0ea5e9 40%, #0284c7 100%);
+      background: linear-gradient(145deg, #4f46e5 0%, #6366f1 40%, #4f46e5 100%);
       padding: 48px;
       color: #ffffff;
       position: relative;
@@ -239,7 +269,7 @@ import { AuthService } from './auth.service';
     .shape-1 {
       width: 300px;
       height: 300px;
-      background: #38bdf8;
+      background: #818cf8;
       top: -50px;
       right: -50px;
     }
@@ -247,7 +277,7 @@ import { AuthService } from './auth.service';
     .shape-2 {
       width: 250px;
       height: 250px;
-      background: #0284c7;
+      background: #4338ca;
       bottom: -60px;
       left: -40px;
     }
@@ -255,7 +285,7 @@ import { AuthService } from './auth.service';
     .shape-3 {
       width: 180px;
       height: 180px;
-      background: #38bdf8;
+      background: #818cf8;
       top: 40%;
       left: 30%;
     }
@@ -419,12 +449,6 @@ import { AuthService } from './auth.service';
       line-height: 1.5;
     }
 
-    .alert-success {
-      background-color: #ecfdf5;
-      color: #065f46;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
     .input-wrapper {
       position: relative;
       display: flex;
@@ -456,13 +480,13 @@ import { AuthService } from './auth.service';
 
     .form-input:focus {
       background-color: #ffffff;
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
     }
 
     .form-input:focus + .input-icon,
     .input-wrapper:focus-within .input-icon {
-      color: #0ea5e9;
+      color: #6366f1;
     }
 
     .password-label-wrapper {
@@ -475,13 +499,13 @@ import { AuthService } from './auth.service';
     .forgot-password {
       font-size: 13px;
       font-weight: 600;
-      color: #0ea5e9;
+      color: #6366f1;
       text-decoration: none;
       transition: color 0.2s ease;
     }
 
     .forgot-password:hover {
-      color: #0284c7;
+      color: #4f46e5;
       text-decoration: underline;
     }
 
@@ -490,15 +514,15 @@ import { AuthService } from './auth.service';
       font-size: 15px;
       font-weight: 700;
       border-radius: 12px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       margin-top: 8px;
     }
 
     .btn-lg:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
     }
 
     .btn-lg:disabled {
@@ -538,7 +562,7 @@ import { AuthService } from './auth.service';
 
     .signup-link {
       font-weight: 700;
-      color: #0ea5e9;
+      color: #6366f1;
       text-decoration: none;
       margin-left: 4px;
     }
@@ -579,6 +603,10 @@ export class LoginComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  showForgotModal = signal(false);
+  forgotSuccess = signal(false);
+  resetEmail = '';
+
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     password: new FormControl('', { nonNullable: true, validators: [Validators.required] })
@@ -607,6 +635,23 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/dashboard']);
     } else {
       this.errorMessage.set(result.error || 'Login failed');
+    }
+  }
+
+  openForgotPassword(event: Event): void {
+    event.preventDefault();
+    this.showForgotModal.set(true);
+    this.forgotSuccess.set(false);
+    this.resetEmail = '';
+  }
+
+  closeForgotPassword(): void {
+    this.showForgotModal.set(false);
+  }
+
+  submitForgotPassword(): void {
+    if (this.resetEmail) {
+      this.forgotSuccess.set(true);
     }
   }
 }

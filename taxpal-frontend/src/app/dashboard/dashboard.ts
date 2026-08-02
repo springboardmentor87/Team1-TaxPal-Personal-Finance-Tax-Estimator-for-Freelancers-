@@ -365,51 +365,63 @@ interface DonutItem {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.2px;
     }
 
     .kpi-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .icon-income { background-color: var(--income-light); color: var(--income); }
-    .icon-expense { background-color: var(--expense-light); color: var(--expense); }
-    .icon-tax { background-color: var(--accent-orange-light); color: var(--accent-orange); }
-    .icon-savings { background-color: var(--primary-light); color: var(--primary); }
+    .kpi-card:hover .kpi-icon {
+      transform: scale(1.12) rotate(4deg);
+    }
+
+    .icon-income { background-color: var(--income-light); color: var(--income-hover); }
+    .icon-expense { background-color: var(--expense-light); color: var(--expense-hover); }
+    .icon-tax { background-color: var(--accent-amber-light); color: #d97706; }
+    .icon-savings { background-color: #e0e7ff; color: var(--primary-hover); }
 
     .kpi-value {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
       color: var(--text-primary);
-      letter-spacing: -0.5px;
-      line-height: 1.2;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+      font-feature-settings: "tnum";
     }
 
     .kpi-footer {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 8px;
     }
 
     .trend {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
-      font-size: 11px;
+      gap: 4px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 2px 6px;
+      padding: 3px 8px;
       border-radius: var(--radius-full);
+      animation: springBounce 0.5s ease-out;
     }
 
-    .trend-up { background-color: var(--income-light); color: var(--income-hover); }
-    .trend-down { background-color: var(--expense-light); color: var(--expense-hover); }
+    .trend-up {
+      background-color: var(--income-light);
+      color: var(--income-hover);
+    }
+
+    .trend-down {
+      background-color: var(--expense-light);
+      color: var(--expense-hover);
+    }
 
     .kpi-subtext {
       font-size: 12px;
