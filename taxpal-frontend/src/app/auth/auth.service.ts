@@ -1,106 +1,98 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, catchError, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { StorageService } from '../shared/storage.service';
 import { User } from '../transactions/transaction.model';
-import { DEMO_USER } from '../mock-data/seed-data';
+
+export interface AuthResponse {
+  success: boolean;
+  message?: string;
+  token?: string;
+  user?: User;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly USERS_KEY = 'taxpal_users';
+  private readonly API_URL = 'http://localhost:5000/api/auth';
+  private readonly TOKEN_KEY = 'taxpal_auth_token';
   private readonly CURRENT_USER_KEY = 'taxpal_current_user';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
 
-  constructor(private storageService: StorageService) {
-    this.initializeUsers();
+  constructor(
+    private http: HttpClient,
+    private storageService: StorageService
+  ) {
     const savedUser = this.storageService.getItem<User>(this.CURRENT_USER_KEY);
     if (savedUser) {
       this.currentUserSubject.next(savedUser);
     }
   }
 
-  private initializeUsers(): void {
-    let users = this.storageService.getItem<User[]>(this.USERS_KEY);
-
-    // Reset if storage has incompatible structures
-    if (users && (!Array.isArray(users) || users.some(u => !u || !u.username))) {
-      this.storageService.removeItem(this.USERS_KEY);
-      this.storageService.removeItem(this.CURRENT_USER_KEY);
-      users = null;
-    }
-
-    if (!users || users.length === 0) {
-      this.storageService.setItem(this.USERS_KEY, [DEMO_USER]);
-    }
-  }
-
-  getUsers(): User[] {
-    return this.storageService.getItem<User[]>(this.USERS_KEY) || [];
+  getToken(): string | null {
+    return this.storageService.getItem<string>(this.TOKEN_KEY);
   }
 
   getCurrentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  login(username: string, password: string): { success: boolean; error?: string } {
-    const users = this.getUsers();
-    const user = users.find(
-      u => u && u.username && u.username.toLowerCase() === username.trim().toLowerCase()
+  login(email: string, password: string): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, { email, password }).pipe(
+      map(res => {
+        if (res.token && res.user) {
+          this.storageService.setItem(this.TOKEN_KEY, res.token);
+          this.storageService.setItem(this.CURRENT_USER_KEY, res.user);
+          this.currentUserSubject.next(res.user);
+          return { success: true };
+        }
+        return { success: false, error: res.message || 'Login failed' };
+      }),
+      catchError(err => {
+        const errorMsg = err.error?.message || err.message || 'Login failed';
+        return of({ success: false, error: errorMsg });
+      })
     );
-
-    if (!user) {
-      return { success: false, error: 'User does not exist' };
-    }
-
-    if (user.password !== password) {
-      return { success: false, error: 'Incorrect password' };
-    }
-
-    // Login successful
-    const { password: _, ...userWithoutPassword } = user;
-    this.storageService.setItem(this.CURRENT_USER_KEY, userWithoutPassword);
-    this.currentUserSubject.next(userWithoutPassword);
-    return { success: true };
   }
 
-  signup(user: Omit<User, 'id'>): { success: boolean; error?: string } {
-    const users = this.getUsers();
-
-    if (users.some(u => u && u.username && u.username.toLowerCase() === user.username.trim().toLowerCase())) {
-      return { success: false, error: 'Username is already taken' };
-    }
-
-    if (users.some(u => u && u.email && u.email.toLowerCase() === user.email.trim().toLowerCase())) {
-      return { success: false, error: 'Email is already registered' };
-    }
-
-    const newUser: User = {
-      ...user,
-      username: user.username.trim(),
-      email: user.email.trim(),
-      id: 'user_' + Math.random().toString(36).substring(2, 11)
-    };
-
-    users.push(newUser);
-    this.storageService.setItem(this.USERS_KEY, users);
-
-    // Auto-login after registration
-    const { password: _, ...userWithoutPassword } = newUser;
-    this.storageService.setItem(this.CURRENT_USER_KEY, userWithoutPassword);
-    this.currentUserSubject.next(userWithoutPassword);
-
-    return { success: true };
+  signup(userData: {
+    name: string;
+    email: string;
+    password: string;
+    country: string;
+    income_bracket: string;
+    username?: string;
+  }): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/register`, {
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      country: userData.country,
+      income_bracket: userData.income_bracket || 'Default'
+    }).pipe(
+      map(res => {
+        if (res.success) {
+          return { success: true };
+        }
+        return { success: false, error: res.message || 'Registration failed' };
+      }),
+      catchError(err => {
+        const errorMsg = err.error?.message || err.message || 'Registration failed';
+        return of({ success: false, error: errorMsg });
+      })
+    );
   }
 
   logout(): void {
+    this.storageService.removeItem(this.TOKEN_KEY);
     this.storageService.removeItem(this.CURRENT_USER_KEY);
     this.currentUserSubject.next(null);
   }
 
   isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.currentUserSubject.value !== null && !!this.getToken();
   }
 }

@@ -628,14 +628,14 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.invalid) return;
 
     const { username, password } = this.loginForm.getRawValue();
-    const result = this.authService.login(username, password);
-
-    if (result.success) {
-      this.errorMessage.set(null);
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.errorMessage.set(result.error || 'Login failed');
-    }
+    this.authService.login(username, password).subscribe(result => {
+      if (result.success) {
+        this.errorMessage.set(null);
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.errorMessage.set(result.error || 'Login failed');
+      }
+    });
   }
 
   openForgotPassword(event: Event): void {

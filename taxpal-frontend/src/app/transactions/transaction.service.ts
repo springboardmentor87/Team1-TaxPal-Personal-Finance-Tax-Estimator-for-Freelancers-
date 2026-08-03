@@ -1,81 +1,86 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { StorageService } from '../shared/storage.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth/auth.service';
 import { Transaction } from './transaction.model';
-import { generateMockTransactions } from '../mock-data/seed-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
-  private readonly TRANSACTIONS_KEY = 'taxpal_transactions';
+  private readonly API_URL = 'http://localhost:5000/api/transactions';
 
   private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();
 
-  private currentUserId: string | null = null;
-
   constructor(
-    private storageService: StorageService,
+    private http: HttpClient,
     private authService: AuthService
   ) {
-    // Listen to current user changes
     this.authService.currentUser$.subscribe(user => {
       if (user) {
-        this.currentUserId = user.id;
         this.loadTransactions();
       } else {
-        this.currentUserId = null;
         this.transactionsSubject.next([]);
       }
     });
   }
 
-  private loadTransactions(): void {
-    if (!this.currentUserId) return;
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
 
-    let allTransactions = this.storageService.getItem<Transaction[]>(this.TRANSACTIONS_KEY) || [];
-
-    // If it's the demo user and there are no transactions, seed mock data
-    if (this.currentUserId === 'user_demo') {
-      const demoTxs = allTransactions.filter(t => t.user_id === 'user_demo');
-      if (demoTxs.length === 0) {
-        const seeded = generateMockTransactions('user_demo');
-        allTransactions = [...allTransactions, ...seeded];
-        this.storageService.setItem(this.TRANSACTIONS_KEY, allTransactions);
+  public loadTransactions(): void {
+    const headers = this.getAuthHeaders();
+    this.http.get<{ success: boolean; data: any[] }>(`${this.API_URL}/get`, { headers }).subscribe({
+      next: (res) => {
+        if (res.success && Array.isArray(res.data)) {
+          const mapped: Transaction[] = res.data.map(item => ({
+            id: item.id ? item.id.toString() : '',
+            user_id: item.user_id ? item.user_id.toString() : '',
+            description: item.title || item.description || '',
+            amount: Number(item.amount),
+            type: (item.type || '').toLowerCase() as 'income' | 'expense',
+            category: item.category,
+            date: item.transaction_date || item.date
+          }));
+          this.transactionsSubject.next(mapped);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch transactions from backend:', err);
       }
-    }
-
-    const userTransactions = allTransactions.filter(t => t.user_id === this.currentUserId);
-    // Sort transactions by date descending
-    userTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    this.transactionsSubject.next(userTransactions);
+    });
   }
 
   addTransaction(transaction: Omit<Transaction, 'id' | 'user_id'>): void {
-    if (!this.currentUserId) return;
-
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: 'tx_' + Math.random().toString(36).substring(2, 11),
-      user_id: this.currentUserId
+    const headers = this.getAuthHeaders();
+    const payload = {
+      title: transaction.description || transaction.category || 'Transaction',
+      amount: transaction.amount,
+      type: transaction.type === 'income' ? 'Income' : 'Expense',
+      category: transaction.category,
+      transaction_date: transaction.date
     };
 
-    const allTransactions = this.storageService.getItem<Transaction[]>(this.TRANSACTIONS_KEY) || [];
-    allTransactions.push(newTransaction);
-    this.storageService.setItem(this.TRANSACTIONS_KEY, allTransactions);
-
-    this.loadTransactions();
+    this.http.post<{ success: boolean }>(`${this.API_URL}/add`, payload, { headers }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.loadTransactions();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to add transaction to backend:', err);
+      }
+    });
   }
 
   deleteTransaction(id: string): void {
-    if (!this.currentUserId) return;
-
-    let allTransactions = this.storageService.getItem<Transaction[]>(this.TRANSACTIONS_KEY) || [];
-    allTransactions = allTransactions.filter(t => t.id !== id);
-    this.storageService.setItem(this.TRANSACTIONS_KEY, allTransactions);
-
-    this.loadTransactions();
+    // Optimistic UI update or refresh after deletion
+    const current = this.transactionsSubject.value.filter(t => t.id !== id);
+    this.transactionsSubject.next(current);
   }
 }

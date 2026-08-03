@@ -664,20 +664,20 @@ export class SignupComponent {
     if (this.signupForm.invalid) return;
 
     const values = this.signupForm.getRawValue();
-    const result = this.authService.signup({
+    this.authService.signup({
       username: values.username,
       password: values.password,
       name: values.fullName,
       email: values.email,
       country: values.country,
-      income_bracket: values.incomeBracket || undefined
+      income_bracket: values.incomeBracket || 'Default'
+    }).subscribe(result => {
+      if (result.success) {
+        this.errorMessage.set(null);
+        this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
+      } else {
+        this.errorMessage.set(result.error || 'Signup failed');
+      }
     });
-
-    if (result.success) {
-      this.errorMessage.set(null);
-      this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
-    } else {
-      this.errorMessage.set(result.error || 'Signup failed');
-    }
   }
 }
