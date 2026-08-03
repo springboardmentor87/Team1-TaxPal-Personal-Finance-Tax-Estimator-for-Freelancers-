@@ -167,8 +167,23 @@ import { AuthService } from './auth.service';
                     id="password" 
                     formControlName="password"
                     class="form-input with-icon" 
-                    placeholder="At least 6 characters" 
+                    placeholder="Min 8 chars (e.g. Password123)" 
                     required>
+                </div>
+                <!-- Password Requirement Feedback -->
+                <div class="password-requirements" *ngIf="signupForm.get('password')?.touched || signupForm.get('password')?.value">
+                  <div class="req-item" [class.valid]="hasMinLength()" [class.invalid]="!hasMinLength()">
+                    <span>{{ hasMinLength() ? '✓' : '✕' }} At least 8 characters</span>
+                  </div>
+                  <div class="req-item" [class.valid]="hasCapitalLetter()" [class.invalid]="!hasCapitalLetter()">
+                    <span>{{ hasCapitalLetter() ? '✓' : '✕' }} At least 1 capital letter (A-Z)</span>
+                  </div>
+                  <div class="req-item" [class.valid]="hasLowercaseLetter()" [class.invalid]="!hasLowercaseLetter()">
+                    <span>{{ hasLowercaseLetter() ? '✓' : '✕' }} At least 1 lowercase letter (a-z)</span>
+                  </div>
+                  <div class="req-item" [class.valid]="hasNumber()" [class.invalid]="!hasNumber()">
+                    <span>{{ hasNumber() ? '✓' : '✕' }} At least 1 number (0-9)</span>
+                  </div>
                 </div>
               </div>
 
@@ -533,6 +548,31 @@ import { AuthService } from './auth.service';
       padding-right: 36px;
     }
 
+    .password-requirements {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    .req-item {
+      font-size: 12px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .req-item.valid {
+      color: #16a34a;
+    }
+
+    .req-item.invalid {
+      color: #dc2626;
+    }
+
     .btn-lg {
       height: 48px;
       font-size: 15px;
@@ -667,8 +707,39 @@ export class SignupComponent {
     private router: Router
   ) {}
 
+  hasMinLength(): boolean {
+    const val = this.signupForm.get('password')?.value || '';
+    return val.length >= 8;
+  }
+
+  hasCapitalLetter(): boolean {
+    const val = this.signupForm.get('password')?.value || '';
+    return /[A-Z]/.test(val);
+  }
+
+  hasLowercaseLetter(): boolean {
+    const val = this.signupForm.get('password')?.value || '';
+    return /[a-z]/.test(val);
+  }
+
+  hasNumber(): boolean {
+    const val = this.signupForm.get('password')?.value || '';
+    return /\d/.test(val);
+  }
+
   onSubmit(): void {
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.invalid) {
+      if (!this.hasCapitalLetter()) {
+        this.errorMessage.set('Password must contain at least one capital letter (A-Z).');
+      } else if (!this.hasMinLength()) {
+        this.errorMessage.set('Password must be at least 8 characters long.');
+      } else if (!this.hasLowercaseLetter()) {
+        this.errorMessage.set('Password must contain at least one lowercase letter (a-z).');
+      } else if (!this.hasNumber()) {
+        this.errorMessage.set('Password must contain at least one number (0-9).');
+      }
+      return;
+    }
 
     const values = this.signupForm.getRawValue();
     this.authService.signup({
