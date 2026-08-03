@@ -4,7 +4,7 @@ const authService = require("../services/authService");
 const registerUser = async (req, res) => {
     console.log("Controller Layer - Register");
     try {
-        const { name, email, password, country, income_bracket } = req.body;
+        const { name, username, email, password, country, income_bracket } = req.body;
 
         if (!name || !email || !password || !country || !income_bracket) {
             return res.status(400).json({
@@ -15,6 +15,7 @@ const registerUser = async (req, res) => {
 
         const result = await authService.register({
             name,
+            username,
             email,
             password,
             country,
@@ -35,8 +36,7 @@ const registerUser = async (req, res) => {
         }
         return res.status(500).json({
             success: false,
-            message: "Internal server error",
-            error: error.message
+            message: error.message || "Internal server error"
         });
     }
 };
@@ -65,16 +65,9 @@ const loginUser = async (req, res) => {
         });
     } catch (error) {
         console.error("Login Error:", error.message);
-        if (error.message === "Invalid email or password") {
-            return res.status(401).json({
-                success: false,
-                message: error.message
-            });
-        }
-        return res.status(500).json({
+        return res.status(400).json({
             success: false,
-            message: "Internal server error",
-            error: error.message
+            message: error.message || "Login failed"
         });
     }
 };

@@ -10,6 +10,7 @@ const register = async (userData) => {
 
     const {
         name,
+        username,
         email,
         password,
         country,
@@ -19,6 +20,12 @@ const register = async (userData) => {
     // Validate fields
     if (!name || !email || !password || !country || !income_bracket) {
         throw new Error("All fields are required");
+    }
+
+    // Password complexity check: min 8 chars, at least 1 uppercase letter, 1 lowercase letter, 1 number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        throw new Error("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.");
     }
 
     // Check if user already exists
@@ -34,6 +41,7 @@ const register = async (userData) => {
     // Save user
     const newUser = await UserModel.createUser({
         name,
+        username,
         email,
         password: hashedPassword,
         country,
@@ -43,6 +51,7 @@ const register = async (userData) => {
     return {
         id: newUser.id,
         name: newUser.name,
+        username: newUser.username,
         email: newUser.email,
         country: newUser.country,
         income_bracket: newUser.income_bracket

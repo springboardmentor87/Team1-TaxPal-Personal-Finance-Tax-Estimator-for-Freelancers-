@@ -40,8 +40,12 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  login(email: string, password: string): Observable<{ success: boolean; error?: string }> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, { email, password }).pipe(
+  login(identifier: string, password: string): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, {
+      username: identifier,
+      email: identifier,
+      password
+    }).pipe(
       map(res => {
         if (res.token && res.user) {
           this.storageService.setItem(this.TOKEN_KEY, res.token);
@@ -68,6 +72,7 @@ export class AuthService {
   }): Observable<{ success: boolean; error?: string }> {
     return this.http.post<AuthResponse>(`${this.API_URL}/register`, {
       name: userData.name,
+      username: userData.username,
       email: userData.email,
       password: userData.password,
       country: userData.country,
