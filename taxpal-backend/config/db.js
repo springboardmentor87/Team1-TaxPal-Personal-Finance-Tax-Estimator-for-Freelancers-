@@ -1,20 +1,15 @@
 const mysql = require("mysql2");
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+const db = mysql.createPool({
+    host: process.env.DB_HOST || "127.0.0.1",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "taxpal",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect((err) => {
-    if (err) {
-        console.log("Database connection failed");
-        console.log(err);
-        return;
-    }
-
-    console.log("MySQL Connected Successfully");
-});
+console.log("MySQL Connection Pool Created Successfully");
 
 module.exports = db;
