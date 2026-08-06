@@ -11,7 +11,7 @@ TaxPal is built as an end-to-end full-stack solution featuring a responsive Angu
 ```
 ┌───────────────────────────────┐     HTTP REST API      ┌───────────────────────────────┐      SQL Queries      ┌───────────────────────────────┐
 │     Angular 21 Frontend       │ ────────────────────>  │    Node.js / Express Backend  │ ────────────────────> │        MySQL Database         │
-│  (taxpal-frontend - Port 4200)│ <────────────────────  │  (taxpal-backend - Port 5000) │ <──────────────────── │           (taxpal)            │
+│  (taxpal-frontend - Port 4200)│ <────────────────────  │  (taxpal-backend - Port 8080) │ <──────────────────── │           (taxpal)            │
 └───────────────────────────────┘       JWT Auth         └───────────────────────────────┘        mysql2         └───────────────────────────────┘
 ```
 
