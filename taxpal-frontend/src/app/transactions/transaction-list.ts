@@ -9,6 +9,7 @@ import { SidebarComponent } from '../shared/sidebar';
 import { HeaderComponent } from '../shared/header';
 import { BadgeComponent } from '../shared/badge';
 import { TransactionModalComponent } from './transaction-modal';
+import { CurrencyService } from '../shared/currency.service';
 
 @Component({
   selector: 'app-transaction-list',
@@ -57,15 +58,15 @@ import { TransactionModalComponent } from './transaction-modal';
         <section class="summary-cards">
           <div class="card summary-card">
             <span class="card-title">Total Income (Lifetime)</span>
-            <span class="card-value text-income">{{ totalIncome | currency:'INR':'symbol-narrow' }}</span>
+            <span class="card-value text-income">{{ currencySymbol }}{{ totalIncome | number:'1.2-2' }}</span>
           </div>
           <div class="card summary-card">
             <span class="card-title">Total Expenses (Lifetime)</span>
-            <span class="card-value text-expense">{{ totalExpenses | currency:'INR':'symbol-narrow' }}</span>
+            <span class="card-value text-expense">{{ currencySymbol }}{{ totalExpenses | number:'1.2-2' }}</span>
           </div>
           <div class="card summary-card">
             <span class="card-title">Net Balance</span>
-            <span class="card-value" [ngClass]="netBalance >= 0 ? 'text-income' : 'text-expense'">{{ netBalance | currency:'INR':'symbol-narrow' }}</span>
+            <span class="card-value" [ngClass]="netBalance >= 0 ? 'text-income' : 'text-expense'">{{ currencySymbol }}{{ netBalance | number:'1.2-2' }}</span>
           </div>
         </section>
 
@@ -118,7 +119,7 @@ import { TransactionModalComponent } from './transaction-modal';
                     <span class="category-chip">{{ tx.category }}</span>
                   </td>
                   <td class="text-right font-semibold" [ngClass]="tx.type === 'income' ? 'text-income' : 'text-expense'">
-                    {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol-narrow' }}
+                    {{ tx.type === 'income' ? '+' : '-' }}{{ currencySymbol }}{{ tx.amount | number:'1.2-2' }}
                   </td>
                   <td>
                     <app-badge [type]="tx.type"></app-badge>
@@ -390,13 +391,20 @@ export class TransactionListComponent implements OnInit {
   modalType: 'income' | 'expense' = 'income';
   confirmDeleteId: string | null = null;
 
+  currencySymbol = '₹';
+
   constructor(
     private authService: AuthService,
     private transactionService: TransactionService,
+    private currencyService: CurrencyService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.currencyService.symbol$.subscribe(sym => {
+      this.currencySymbol = sym;
+    });
+
     this.authService.currentUser$.subscribe(u => {
       this.user = u;
       if (!u) {

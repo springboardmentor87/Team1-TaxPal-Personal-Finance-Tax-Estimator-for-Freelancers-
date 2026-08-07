@@ -36,11 +36,18 @@ import { User } from '../transactions/transaction.model';
           <span>Transactions</span>
         </a>
         
-        <a class="nav-item" routerLink="/coming-soon" [queryParams]="{module: 'Budgets'}" routerLinkActive="active" (click)="onNavClick()">
+        <a class="nav-item" routerLink="/budgets" routerLinkActive="active" (click)="onNavClick()">
           <svg class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>Budgets</span>
+        </a>
+
+        <a class="nav-item" routerLink="/categories" routerLinkActive="active" (click)="onNavClick()">
+          <svg class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10M7 12h10M7 17h10" />
+          </svg>
+          <span>Categories</span>
         </a>
         
         <a class="nav-item" routerLink="/coming-soon" [queryParams]="{module: 'Tax Estimator'}" routerLinkActive="active" (click)="onNavClick()">

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ModalWrapperComponent } from '../shared/modal-wrapper';
 import { Transaction } from './transaction.model';
+import { CategoryService } from '../categories/category.service';
+import { CurrencyService } from '../shared/currency.service';
 
 @Component({
   selector: 'app-transaction-modal',
@@ -30,11 +32,19 @@ import { Transaction } from './transaction.model';
               type="text" 
               id="description" 
               formControlName="description" 
+              (input)="onDescriptionInput()"
               class="form-input" 
-              placeholder="e.g. Web Design Project"
+              placeholder="e.g. Web Design Project or AWS Cloud Server"
               required>
             <div *ngIf="txForm.get('description')?.invalid && (txForm.get('description')?.dirty || txForm.get('description')?.touched)" class="input-error-msg">
               Description is required.
+            </div>
+
+            <!-- Auto-Categorization Suggestion Banner -->
+            <div class="auto-suggest-banner" *ngIf="suggestedCategory && !txForm.get('category')?.value">
+              <span class="suggest-icon">⚡</span>
+              <span>Suggested Category: <strong>{{ suggestedCategory }}</strong></span>
+              <button type="button" class="btn-apply-suggestion" (click)="applySuggestedCategory()">Apply</button>
             </div>
           </div>
 
@@ -42,7 +52,7 @@ import { Transaction } from './transaction.model';
           <div class="form-group">
             <label class="form-label" for="amount">Amount</label>
             <div class="amount-input-wrapper">
-              <span class="currency-symbol">₹</span>
+              <span class="currency-symbol">{{ currencySymbol }}</span>
               <input 
                 type="number" 
                 id="amount" 
@@ -148,6 +158,34 @@ import { Transaction } from './transaction.model';
     .modal-body .form-group:last-child {
       margin-bottom: 0;
     }
+
+    .auto-suggest-banner {
+      margin-top: 8px;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #0369a1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .suggest-icon {
+      margin-right: 4px;
+    }
+
+    .btn-apply-suggestion {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   `]
 })
 export class TransactionModalComponent implements OnInit, OnChanges {
@@ -172,6 +210,8 @@ export class TransactionModalComponent implements OnInit, OnChanges {
     'Other'
   ];
 
+  suggestedCategory = '';
+
   txForm = new FormGroup({
     description: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     amount: new FormControl<number | null>(null, { validators: [Validators.required, Validators.min(0.01)] }),
@@ -180,7 +220,17 @@ export class TransactionModalComponent implements OnInit, OnChanges {
     notes: new FormControl('', { nonNullable: true })
   });
 
+  currencySymbol = '₹';
+
+  constructor(
+    private categoryService: CategoryService,
+    private currencyService: CurrencyService
+  ) {}
+
   ngOnInit(): void {
+    this.currencyService.symbol$.subscribe(sym => {
+      this.currencySymbol = sym;
+    });
     this.resetForm();
   }
 
@@ -191,7 +241,23 @@ export class TransactionModalComponent implements OnInit, OnChanges {
   }
 
   getCategories(): string[] {
-    return this.type === 'income' ? this.incomeCategories : this.expenseCategories;
+    const list = this.categoryService.getCategoriesByType(this.type).map(c => c.name);
+    return list.length > 0 ? list : (this.type === 'income' ? this.incomeCategories : this.expenseCategories);
+  }
+
+  onDescriptionInput(): void {
+    const desc = this.txForm.get('description')?.value || '';
+    if (desc.trim()) {
+      this.suggestedCategory = this.categoryService.suggestCategory(desc, this.type);
+    } else {
+      this.suggestedCategory = '';
+    }
+  }
+
+  applySuggestedCategory(): void {
+    if (this.suggestedCategory) {
+      this.txForm.patchValue({ category: this.suggestedCategory });
+    }
   }
 
   resetForm(): void {
@@ -200,6 +266,8 @@ export class TransactionModalComponent implements OnInit, OnChanges {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     const todayStr = `${year}-${month}-${day}`;
+
+    this.suggestedCategory = '';
 
     this.txForm.reset({
       description: '',

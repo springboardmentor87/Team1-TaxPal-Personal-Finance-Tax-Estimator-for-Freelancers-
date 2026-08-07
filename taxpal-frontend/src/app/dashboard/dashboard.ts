@@ -11,6 +11,7 @@ import { SidebarComponent } from '../shared/sidebar';
 import { HeaderComponent } from '../shared/header';
 import { BadgeComponent } from '../shared/badge';
 import { TransactionModalComponent } from '../transactions/transaction-modal';
+import { CurrencyService } from '../shared/currency.service';
 
 Chart.register(...registerables);
 
@@ -85,7 +86,7 @@ interface DonutItem {
                 </svg>
               </div>
             </div>
-            <div class="kpi-value">{{ totalIncome | currency:'INR':'symbol-narrow' }}</div>
+            <div class="kpi-value">{{ currencySymbol }}{{ totalIncome | number:'1.2-2' }}</div>
             <div class="kpi-footer">
               <span class="trend trend-up">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -107,7 +108,7 @@ interface DonutItem {
                 </svg>
               </div>
             </div>
-            <div class="kpi-value">{{ totalExpenses | currency:'INR':'symbol-narrow' }}</div>
+            <div class="kpi-value">{{ currencySymbol }}{{ totalExpenses | number:'1.2-2' }}</div>
             <div class="kpi-footer">
               <span class="trend trend-down">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -131,7 +132,7 @@ interface DonutItem {
                 </svg>
               </div>
             </div>
-            <div class="kpi-value">{{ estimatedTax | currency:'INR':'symbol-narrow' }}</div>
+            <div class="kpi-value">{{ currencySymbol }}{{ estimatedTax | number:'1.2-2' }}</div>
             <div class="kpi-footer">
               <span class="kpi-subtext">{{ estimatedTax > 0 ? 'Estimated at 15% rate' : 'No taxes due' }}</span>
             </div>
@@ -195,7 +196,7 @@ interface DonutItem {
                     <span class="breakdown-category-name">{{ item.category }}</span>
                   </div>
                   <div class="breakdown-values">
-                    <span class="breakdown-val font-semibold mr-2">{{ item.value | currency:'INR':'symbol-narrow' }}</span>
+                    <span class="breakdown-val font-semibold mr-2">{{ currencySymbol }}{{ item.value | number:'1.2-2' }}</span>
                     <span class="breakdown-pct text-light">({{ item.percentage | number:'1.0-0' }}%)</span>
                   </div>
                 </div>
@@ -238,7 +239,7 @@ interface DonutItem {
                     <span class="category-chip">{{ tx.category }}</span>
                   </td>
                   <td class="text-right font-semibold" [ngClass]="tx.type === 'income' ? 'text-income' : 'text-expense'">
-                    {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol-narrow' }}
+                    {{ tx.type === 'income' ? '+' : '-' }}{{ currencySymbol }}{{ tx.amount | number:'1.2-2' }}
                   </td>
                   <td>
                     <app-badge [type]="tx.type"></app-badge>
@@ -682,13 +683,22 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private authSub: Subscription | null = null;
   private txSub: Subscription | null = null;
 
+  currencySymbol = '₹';
+
   constructor(
     private authService: AuthService,
     private transactionService: TransactionService,
+    private currencyService: CurrencyService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.currencyService.symbol$.subscribe(sym => {
+      this.currencySymbol = sym;
+      if (this.barChartCanvas) this.updateBarChart();
+      if (this.donutChartCanvas) this.updateDonutChart();
+    });
+
     this.authSub = this.authService.currentUser$.subscribe(u => {
       this.user = u;
       if (!u) {
