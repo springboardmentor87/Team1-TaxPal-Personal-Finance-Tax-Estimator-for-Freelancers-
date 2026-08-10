@@ -3,10 +3,10 @@ const db = require("../config/db");
 const BudgetModel = {
     // Create a budget
     create: (budgetData) => {
-        const { user_id, category, limit, month } = budgetData;
+        const { user_id, category, description, limit, month } = budgetData;
         return new Promise((resolve, reject) => {
-            const sql = "INSERT INTO budgets (user_id, category, `limit`, month) VALUES (?, ?, ?, ?)";
-            db.query(sql, [user_id, category, limit, month], (err, result) => {
+            const sql = "INSERT INTO budgets (user_id, category, description, `limit`, month) VALUES (?, ?, ?, ?, ?)";
+            db.query(sql, [user_id, category, description, limit, month], (err, result) => {
                 if (err) {
                     return reject(err);
                 }
@@ -14,6 +14,7 @@ const BudgetModel = {
                     id: result.insertId,
                     user_id,
                     category,
+                    description,
                     limit,
                     month
                 });
@@ -21,10 +22,10 @@ const BudgetModel = {
         });
     },
 
-    // Get budgets for the logged-in user
+    // Get budgets for the logged-in user (with formatted date strings)
     getAllByUserId: (userId) => {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT * FROM budgets WHERE user_id = ?";
+            const sql = "SELECT id, user_id, category, description, `limit`, DATE_FORMAT(month, '%Y-%m-%d') AS month FROM budgets WHERE user_id = ?";
             db.query(sql, [userId], (err, results) => {
                 if (err) {
                     return reject(err);
@@ -34,10 +35,10 @@ const BudgetModel = {
         });
     },
 
-    // Get a specific budget belonging to the logged-in user
+    // Get a specific budget belonging to the logged-in user (with formatted date string)
     getByIdAndUserId: (id, userId) => {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT * FROM budgets WHERE id = ? AND user_id = ?";
+            const sql = "SELECT id, user_id, category, description, `limit`, DATE_FORMAT(month, '%Y-%m-%d') AS month FROM budgets WHERE id = ? AND user_id = ?";
             db.query(sql, [id, userId], (err, results) => {
                 if (err) {
                     return reject(err);
@@ -49,10 +50,10 @@ const BudgetModel = {
 
     // Update a budget
     update: (id, userId, budgetData) => {
-        const { category, limit, month } = budgetData;
+        const { category, description, limit, month } = budgetData;
         return new Promise((resolve, reject) => {
-            const sql = "UPDATE budgets SET category = ?, `limit` = ?, month = ? WHERE id = ? AND user_id = ?";
-            db.query(sql, [category, limit, month, id, userId], (err, result) => {
+            const sql = "UPDATE budgets SET category = ?, description = ?, `limit` = ?, month = ? WHERE id = ? AND user_id = ?";
+            db.query(sql, [category, description, limit, month, id, userId], (err, result) => {
                 if (err) {
                     return reject(err);
                 }

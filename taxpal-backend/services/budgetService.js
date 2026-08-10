@@ -1,8 +1,17 @@
 const BudgetModel = require("../models/budgetModel");
 
+// Helper to validate YYYY-MM-DD date format and parse validity
+const isValidDate = (dateStr) => {
+    if (typeof dateStr !== "string") return false;
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(dateStr.trim())) return false;
+    const parsed = Date.parse(dateStr.trim());
+    return !isNaN(parsed);
+};
+
 // Create a budget
 const createBudget = async (userId, budgetData) => {
-    const { category, limit, month } = budgetData;
+    const { category, description, limit, month } = budgetData;
 
     // Validate fields
     if (!category || typeof category !== "string" || category.trim() === "") {
@@ -18,10 +27,16 @@ const createBudget = async (userId, budgetData) => {
     if (!month || typeof month !== "string" || month.trim() === "") {
         throw new Error("Month is required");
     }
+    if (!isValidDate(month)) {
+        throw new Error("Month must be a valid date (YYYY-MM-DD)");
+    }
+
+    const trimmedDesc = description !== undefined && description !== null ? String(description).trim() : null;
 
     return await BudgetModel.create({
         user_id: userId,
         category: category.trim(),
+        description: trimmedDesc,
         limit: numLimit,
         month: month.trim()
     });
@@ -43,7 +58,7 @@ const getBudgetById = async (id, userId) => {
 
 // Update a budget
 const updateBudget = async (id, userId, budgetData) => {
-    const { category, limit, month } = budgetData;
+    const { category, description, limit, month } = budgetData;
 
     // Validate fields
     if (!category || typeof category !== "string" || category.trim() === "") {
@@ -59,6 +74,9 @@ const updateBudget = async (id, userId, budgetData) => {
     if (!month || typeof month !== "string" || month.trim() === "") {
         throw new Error("Month is required");
     }
+    if (!isValidDate(month)) {
+        throw new Error("Month must be a valid date (YYYY-MM-DD)");
+    }
 
     // Verify ownership and existence
     const budget = await BudgetModel.getByIdAndUserId(id, userId);
@@ -66,8 +84,11 @@ const updateBudget = async (id, userId, budgetData) => {
         throw new Error("Budget not found or unauthorized");
     }
 
+    const trimmedDesc = description !== undefined && description !== null ? String(description).trim() : null;
+
     const updated = await BudgetModel.update(id, userId, {
         category: category.trim(),
+        description: trimmedDesc,
         limit: numLimit,
         month: month.trim()
     });
@@ -80,6 +101,7 @@ const updateBudget = async (id, userId, budgetData) => {
         id: Number(id),
         user_id: userId,
         category: category.trim(),
+        description: trimmedDesc,
         limit: numLimit,
         month: month.trim()
     };

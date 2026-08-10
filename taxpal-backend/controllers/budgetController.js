@@ -3,9 +3,9 @@ const budgetService = require("../services/budgetService");
 const createBudget = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { category, limit, month } = req.body;
+        const { category, description, limit, month } = req.body;
 
-        const newBudget = await budgetService.createBudget(userId, { category, limit, month });
+        const newBudget = await budgetService.createBudget(userId, { category, description, limit, month });
 
         return res.status(201).json({
             success: true,
@@ -16,7 +16,8 @@ const createBudget = async (req, res) => {
         console.error("Create Budget Error:", error.message);
         const isValidationError = 
             error.message.includes("required") || 
-            error.message.includes("positive number");
+            error.message.includes("positive number") ||
+            error.message.includes("valid date");
         
         return res.status(isValidationError ? 400 : 500).json({
             success: false,
@@ -69,9 +70,9 @@ const updateBudget = async (req, res) => {
     try {
         const userId = req.user.id;
         const { id } = req.params;
-        const { category, limit, month } = req.body;
+        const { category, description, limit, month } = req.body;
 
-        const updatedBudget = await budgetService.updateBudget(id, userId, { category, limit, month });
+        const updatedBudget = await budgetService.updateBudget(id, userId, { category, description, limit, month });
 
         return res.status(200).json({
             success: true,
@@ -83,7 +84,8 @@ const updateBudget = async (req, res) => {
         const isNotFound = error.message === "Budget not found or unauthorized";
         const isValidationError = 
             error.message.includes("required") || 
-            error.message.includes("positive number");
+            error.message.includes("positive number") ||
+            error.message.includes("valid date");
 
         const statusCode = isNotFound ? 404 : (isValidationError ? 400 : 500);
 

@@ -36,8 +36,9 @@ CREATE TABLE IF NOT EXISTS budgets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     category VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
     `limit` DECIMAL(10,2) NOT NULL,
-    month VARCHAR(20) NOT NULL,
+    month DATE NOT NULL,
 
     CONSTRAINT fk_budget_user
     FOREIGN KEY (user_id)
