@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS taxpal;
-USE taxpal;
+CREATE DATABASE IF NOT EXISTS taxpal_db;
+USE taxpal_db;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,6 +27,19 @@ CREATE TABLE IF NOT EXISTS transactions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_transaction_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS budgets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    `limit` DECIMAL(10,2) NOT NULL,
+    month VARCHAR(20) NOT NULL,
+
+    CONSTRAINT fk_budget_user
     FOREIGN KEY (user_id)
     REFERENCES users(id)
     ON DELETE CASCADE
