@@ -31,3 +31,19 @@ CREATE TABLE IF NOT EXISTS transactions (
     REFERENCES users(id)
     ON DELETE CASCADE
 );
+
+-- CREATE TABLE IF NOT EXISTS budgets (
+--     id INT AUTO_INCREMENT PRIMARY KEY,
+--     user_id INT NOT NULL,
+--     category VARCHAR(100) NOT NULL,
+--     budget_limit DECIMAL(10,2) NOT NULL,
+--     month DATE NOT NULL,
+--     description VARCHAR(500) NULL,
+
+--     FOREIGN KEY (user_id)
+--         REFERENCES users(id)
+--         ON DELETE CASCADE,
+
+--     UNIQUE KEY unique_user_category_month
+--         (user_id, category, month)
+-- );
