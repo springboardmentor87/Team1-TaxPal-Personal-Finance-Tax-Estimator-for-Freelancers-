@@ -46,3 +46,24 @@ CREATE TABLE IF NOT EXISTS budgets (
     UNIQUE KEY unique_user_category_month
         (user_id, category, month)
 );
+<<<<<<< HEAD
+=======
+
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    color VARCHAR(50) DEFAULT '#3b82f6',
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY unique_user_category_type
+        (user_id, name, type)
+);
+
+>>>>>>> dd2ce35 (feat: complete Milestone 2 backend & frontend sync, SQLite fallback, categories schema, and CRUD operations)
