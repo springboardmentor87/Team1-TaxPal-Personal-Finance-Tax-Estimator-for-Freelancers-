@@ -46,8 +46,6 @@ CREATE TABLE IF NOT EXISTS budgets (
     UNIQUE KEY unique_user_category_month
         (user_id, category, month)
 );
-<<<<<<< HEAD
-=======
 
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,4 +64,3 @@ CREATE TABLE IF NOT EXISTS categories (
         (user_id, name, type)
 );
 
->>>>>>> dd2ce35 (feat: complete Milestone 2 backend & frontend sync, SQLite fallback, categories schema, and CRUD operations)
