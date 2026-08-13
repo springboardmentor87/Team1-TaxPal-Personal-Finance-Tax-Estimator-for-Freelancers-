@@ -1,8 +1,5 @@
 const BudgetService = require("../services/budgetService");
 
-// ==========================================
-// Create Budget
-// ==========================================
 const createBudget = async (req, res) => {
     try {
         const user_id = req.user.id;
@@ -29,9 +26,6 @@ const createBudget = async (req, res) => {
 };
 
 
-// ==========================================
-// Get All Budgets
-// ==========================================
 const getBudgets = async (req, res) => {
     try {
         const user_id = req.user.id;

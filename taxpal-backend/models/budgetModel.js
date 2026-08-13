@@ -2,9 +2,7 @@ const db = require("../config/db");
 
 const BudgetModel = {
 
-    // ==========================================
-    // Create Budget
-    // ==========================================
+
     createBudget: (budgetData) => {
 
         const {
@@ -58,9 +56,6 @@ const BudgetModel = {
     },
 
 
-    // ==========================================
-    // Get All Budgets Of User
-    // ==========================================
     getBudgetsByUser: (user_id) => {
 
         return new Promise((resolve, reject) => {
@@ -88,9 +83,7 @@ const BudgetModel = {
     },
 
 
-    // ==========================================
-    // Get Budgets By Month
-    // ==========================================
+
     getBudgetsByUserAndMonth: (user_id, month) => {
 
         return new Promise((resolve, reject) => {
@@ -119,9 +112,6 @@ const BudgetModel = {
     },
 
 
-    // ==========================================
-    // Get Single Budget
-    // ==========================================
     getBudgetById: (id, user_id) => {
 
         return new Promise((resolve, reject) => {
@@ -148,10 +138,6 @@ const BudgetModel = {
         });
     },
 
-
-    // ==========================================
-    // Update Budget
-    // ==========================================
     updateBudget: (id, user_id, budgetData) => {
 
         const {
@@ -196,10 +182,6 @@ const BudgetModel = {
         });
     },
 
-
-    // ==========================================
-    // Delete Budget
-    // ==========================================
     deleteBudget: (id, user_id) => {
 
         return new Promise((resolve, reject) => {
@@ -225,10 +207,6 @@ const BudgetModel = {
         });
     },
 
-
-    // ==========================================
-    // Get Spending By Category And Month
-    // ==========================================
     getSpendingByCategoryAndMonth: (
         user_id,
         startDate,
