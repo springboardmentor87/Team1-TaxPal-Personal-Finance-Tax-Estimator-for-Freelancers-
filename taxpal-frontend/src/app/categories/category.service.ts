@@ -98,16 +98,6 @@ export class CategoryService {
     this.saveCategories(updated);
   }
 
-  public ensureCategoryExists(name: string, type: 'income' | 'expense' = 'expense'): void {
-    if (!name || !name.trim()) return;
-    const trimmed = name.trim();
-    const current = this.categoriesSubject.value;
-    const exists = current.some(c => c.name.toLowerCase() === trimmed.toLowerCase());
-    if (!exists) {
-      this.addCategory(trimmed, type, '#3b82f6', `${trimmed} category`);
-    }
-  }
-
   public deleteCategory(id: string): void {
     const current = this.categoriesSubject.value;
     const updated = current.filter(c => c.id !== id);

@@ -79,19 +79,8 @@ export class TransactionService {
   }
 
   deleteTransaction(id: string): void {
-    const headers = this.getAuthHeaders();
-    this.http.delete<{ success: boolean }>(`${this.API_URL}/${id}`, { headers }).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.loadTransactions();
-        }
-      },
-      error: (err) => {
-        console.error('Failed to delete transaction:', err);
-        // Fallback optimistic filter
-        const current = this.transactionsSubject.value.filter(t => t.id !== id);
-        this.transactionsSubject.next(current);
-      }
-    });
+    // Optimistic UI update or refresh after deletion
+    const current = this.transactionsSubject.value.filter(t => t.id !== id);
+    this.transactionsSubject.next(current);
   }
 }

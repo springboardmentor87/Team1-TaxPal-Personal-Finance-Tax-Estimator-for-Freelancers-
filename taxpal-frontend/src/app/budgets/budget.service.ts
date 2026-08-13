@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { TransactionService } from '../transactions/transaction.service';
 import { AuthService } from '../auth/auth.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-
-import { CategoryService } from '../categories/category.service';
+import { HttpClient } from '@angular/common/http';
 
 export interface Budget {
   id: string;
@@ -39,12 +37,11 @@ export class BudgetService {
   private budgetsSubject = new BehaviorSubject<Budget[]>([]);
   public budgets$: Observable<Budget[]> = this.budgetsSubject.asObservable();
 
-  private apiUrl = 'http://localhost:8080/api/budget';
+  private apiUrl = 'http://localhost:8080/api/budgets';
 
   constructor(
     private transactionService: TransactionService,
     private authService: AuthService,
-    private categoryService: CategoryService,
     private http: HttpClient
   ) {
     // Clear legacy mock sample budgets from browser storage
@@ -53,25 +50,6 @@ export class BudgetService {
     this.authService.currentUser$.subscribe(user => {
       this.loadBudgetsForUser(user?.id);
     });
-
-    // Auto-clean budgets when categories are deleted in Category Management
-    this.categoryService.categories$.subscribe(categories => {
-      if (categories && categories.length > 0) {
-        const categoryNames = new Set(categories.map(c => c.name.toLowerCase()));
-        const currentBudgets = this.budgetsSubject.value;
-        const orphaned = currentBudgets.filter(b => !categoryNames.has(b.category.toLowerCase()));
-        if (orphaned.length > 0) {
-          orphaned.forEach(b => this.deleteBudget(b.id));
-        }
-      }
-    });
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
   }
 
   private getStorageKey(userId?: string | number): string {
@@ -79,46 +57,21 @@ export class BudgetService {
     return `taxpal_budgets_user_${id}`;
   }
 
-  public loadBudgetsForUser(userId?: string | number): void {
-    const token = this.authService.getToken();
-    if (token) {
-      const headers = this.getAuthHeaders();
-      this.http.get<{ success: boolean; data: any[] }>(this.apiUrl, { headers }).subscribe({
-        next: (res) => {
-          if (res.success && Array.isArray(res.data)) {
-            const mapped: Budget[] = res.data.map(item => ({
-              id: item.id ? item.id.toString() : '',
-              category: item.category,
-              limit: Number(item.budget_limit || item.limit || 0),
-              month: item.month ? item.month.substring(0, 7) : new Date().toISOString().substring(0, 7),
-              description: item.description || '',
-              createdAt: item.created_at || new Date().toISOString()
-            }));
-            this.budgetsSubject.next(mapped);
-            return;
-          }
-          this.loadFromLocalStorage(userId);
-        },
-        error: () => {
-          this.loadFromLocalStorage(userId);
-        }
-      });
-    } else {
-      this.loadFromLocalStorage(userId);
-    }
-  }
-
-  private loadFromLocalStorage(userId?: string | number): void {
+  private loadBudgetsForUser(userId?: string | number): void {
     const storageKey = this.getStorageKey(userId);
     const saved = localStorage.getItem(storageKey);
+
     if (saved) {
       try {
-        this.budgetsSubject.next(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        this.budgetsSubject.next(parsed);
         return;
       } catch (e) {
         console.error('Error reading saved user budgets:', e);
       }
     }
+
+    // Default for any user is EMPTY ([]) so no pre-filled sample data exists
     this.budgetsSubject.next([]);
   }
 
@@ -134,6 +87,7 @@ export class BudgetService {
         const monthBudgets = budgets.filter(b => b.month === targetMonth);
         
         return monthBudgets.map(b => {
+          // Calculate spent in target month for this expense category
           const spent = transactions
             .filter(t => t.type === 'expense' && t.category === b.category && t.date.startsWith(targetMonth))
             .reduce((sum, t) => sum + t.amount, 0);
@@ -142,14 +96,14 @@ export class BudgetService {
           const percentage = b.limit > 0 ? Math.round((spent / b.limit) * 100) : 0;
 
           let status: 'Good' | 'Warning' | 'Exceeded' = 'Good';
-          let statusColor = '#10b981';
+          let statusColor = '#10b981'; // Green
 
           if (percentage >= 100) {
             status = 'Exceeded';
-            statusColor = '#ef4444';
+            statusColor = '#ef4444'; // Red
           } else if (percentage >= 80) {
             status = 'Warning';
-            statusColor = '#f59e0b';
+            statusColor = '#f59e0b'; // Yellow/Orange
           }
 
           return {
@@ -208,38 +162,12 @@ export class BudgetService {
   }
 
   public addBudget(budgetData: Omit<Budget, 'id' | 'createdAt'>): Budget {
-    // Ensure category exists in Category Management
-    if (budgetData.category) {
-      this.categoryService.ensureCategoryExists(budgetData.category, 'expense');
-    }
-
     const current = this.budgetsSubject.value;
     const newBudget: Budget = {
       ...budgetData,
       id: `b-${Date.now()}`,
       createdAt: new Date().toISOString()
     };
-
-    const token = this.authService.getToken();
-    if (token) {
-      const headers = this.getAuthHeaders();
-      const payload = {
-        category: budgetData.category,
-        budget_limit: budgetData.limit,
-        month: `${budgetData.month}-01`,
-        description: budgetData.description
-      };
-      this.http.post<{ success: boolean }>(this.apiUrl, payload, { headers }).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.loadBudgetsForUser();
-          }
-        },
-        error: (err) => {
-          console.error('Failed to add budget to backend:', err);
-        }
-      });
-    }
 
     const updated = [...current, newBudget];
     this.saveBudgets(updated);
@@ -248,48 +176,13 @@ export class BudgetService {
 
   public updateBudget(id: string, newLimit: number, description?: string): void {
     const current = this.budgetsSubject.value;
-    const target = current.find(b => b.id === id);
-
-    const token = this.authService.getToken();
-    if (token && target) {
-      const headers = this.getAuthHeaders();
-      const payload = {
-        category: target.category,
-        budget_limit: newLimit,
-        month: `${target.month}-01`,
-        description: description !== undefined ? description : target.description
-      };
-      this.http.put<{ success: boolean }>(`${this.apiUrl}/${id}`, payload, { headers }).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.loadBudgetsForUser();
-          }
-        },
-        error: (err) => console.error('Failed to update budget on backend:', err)
-      });
-    }
-
     const updated = current.map(b => b.id === id ? { ...b, limit: newLimit, description: description !== undefined ? description : b.description } : b);
     this.saveBudgets(updated);
   }
 
   public deleteBudget(id: string): void {
-    const token = this.authService.getToken();
-    if (token) {
-      const headers = this.getAuthHeaders();
-      this.http.delete<{ success: boolean }>(`${this.apiUrl}/${id}`, { headers }).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.loadBudgetsForUser();
-          }
-        },
-        error: (err) => console.error('Failed to delete budget on backend:', err)
-      });
-    }
-
     const current = this.budgetsSubject.value;
     const updated = current.filter(b => b.id !== id);
     this.saveBudgets(updated);
   }
 }
-
