@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS budgets (
         (user_id, category, month)
 );
 
-
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
