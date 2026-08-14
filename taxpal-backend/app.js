@@ -12,7 +12,8 @@ const authRoutes = require("./routes/authRoutes");
 const transactionRoutes = require("./routes/transactionRoute");
 const dashboardRoutes = require("./routes/dashboardRoute");
 const budgetRoute = require("./routes/budgetRoute");
-const spendingRoutes = require("./routes/spendingRoute");
+// const spendingRoutes = require("./routes/spendingRoute");
+const categoryRoute = require("./routes/categoryRoute");
 
 
 
@@ -22,8 +23,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/budget", budgetRoute);
-app.use("/api/spending", spendingRoutes);
+app.use("/api/budgets", budgetRoute);
+// app.use("/api/spending", spendingRoutes);
+app.use("/api/categories", categoryRoute);
 
 app.get("/", (req, res) => {
     res.send("TaxPal Backend is Running...");
