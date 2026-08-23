@@ -152,16 +152,11 @@ export class CategoryService {
         }),
 
         catchError(error => {
-
           console.error(
             'Get Categories Error:',
             error
           );
-
-          return throwError(
-            () => error
-          );
-
+          return of(this.categoriesSubject.value);
         })
 
       );
