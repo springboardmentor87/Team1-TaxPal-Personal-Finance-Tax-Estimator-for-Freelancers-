@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, catchError, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 export interface TaxCalculationParams {
   country: string;
@@ -15,19 +15,29 @@ export interface TaxCalculationParams {
 }
 
 export interface TaxEstimateResult {
-  country: string;
+  year: number;
+
+  total_income: number;
+  total_expenses: number;
+  taxable_income: number;
+  estimated_tax: number;
+
+  country?: string;
   state?: string;
-  filingStatus: string;
-  quarter: string;
-  grossIncome: number;
-  totalDeductions: number;
-  taxableIncome: number;
-  federalTax: number;
-  stateTax: number;
-  selfEmploymentTax: number;
-  totalEstimatedTax: number;
-  effectiveTaxRate: number;
-  breakdown: {
+  filingStatus?: string;
+  quarter?: string;
+
+  grossIncome?: number;
+  totalDeductions?: number;
+  taxableIncome?: number;
+
+  federalTax?: number;
+  stateTax?: number;
+  selfEmploymentTax?: number;
+  totalEstimatedTax?: number;
+  effectiveTaxRate?: number;
+
+  breakdown?: {
     bracket: string;
     rate: number;
     amount: number;
@@ -35,189 +45,226 @@ export interface TaxEstimateResult {
 }
 
 export interface TaxReminder {
-  id: string;
+  id: string | number;
   title: string;
   quarter: string;
   dueDate: string;
-  reminderDate: string;
+  reminderDate?: string;
   description: string;
   estimatedTaxAmount?: number | null;
   currencySymbol?: string;
-  type: 'reminder' | 'payment';
-  status: 'upcoming' | 'due_soon' | 'completed';
+  type?: 'reminder' | 'payment';
+  status?: 'upcoming' | 'due_soon' | 'completed';
+  severity?: string;
+  alert_type?: string;
+  due_date?: string;
+  is_read?: number | boolean;
+  is_resolved?: number | boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaxEstimatorService {
-  private apiUrl = 'http://localhost:8080/api/tax';
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = 'http://localhost:8080/api';
 
-  calculateTax(params: TaxCalculationParams): Observable<TaxEstimateResult> {
-    return this.http.post<any>(`${this.apiUrl}/calculate`, params).pipe(
-      map(response => response.data || response),
+  constructor(private http: HttpClient) { }
+
+  calculateTax(
+    params: TaxCalculationParams
+  ): Observable<TaxEstimateResult> {
+
+    const year = new Date().getFullYear();
+
+    return this.http.post<any>(
+      `${this.apiUrl}/tax/calculate`,
+      {
+        year,
+        ...params
+      }
+    ).pipe(
+      map((response): TaxEstimateResult => {
+        const data = response?.data || response || {};
+
+        return this.normalizeTaxResult(data, params, year);
+      }),
+
       catchError(() => {
-        // Client-side fallback calculation engine
-        const grossIncome = Number(params.grossIncome) || 0;
-        const businessExpenses = Number(params.businessExpenses) || 0;
-        const retirement = Number(params.retirementContributions) || 0;
-        const healthInsurance = Number(params.healthInsurancePremiums) || 0;
-        const homeOffice = Number(params.homeOfficeDeduction) || 0;
-
-        const totalDeductions = businessExpenses + retirement + healthInsurance + homeOffice;
-        const netIncome = Math.max(0, grossIncome - totalDeductions);
-
-        let federalTax = 0;
-        let stateTax = 0;
-        let selfEmploymentTax = 0;
-        const breakdown: { bracket: string; rate: number; amount: number }[] = [];
-
-        if (params.country === 'India') {
-          const annualIncome = netIncome * 4;
-          let annualTax = 0;
-          
-          if (annualIncome > 1500000) {
-            annualTax = 150000 + (annualIncome - 1500000) * 0.30;
-            breakdown.push({ bracket: '> ₹15,00,000', rate: 30, amount: (annualIncome - 1500000) * 0.30 / 4 });
-          } else if (annualIncome > 1200000) {
-            annualTax = 90000 + (annualIncome - 1200000) * 0.20;
-            breakdown.push({ bracket: '₹12L - ₹15L', rate: 20, amount: (annualIncome - 1200000) * 0.20 / 4 });
-          } else if (annualIncome > 900000) {
-            annualTax = 45000 + (annualIncome - 900000) * 0.15;
-            breakdown.push({ bracket: '₹9L - ₹12L', rate: 15, amount: (annualIncome - 900000) * 0.15 / 4 });
-          } else if (annualIncome > 600000) {
-            annualTax = 15000 + (annualIncome - 600000) * 0.10;
-            breakdown.push({ bracket: '₹6L - ₹9L', rate: 10, amount: (annualIncome - 600000) * 0.10 / 4 });
-          } else if (annualIncome > 300000) {
-            annualTax = (annualIncome - 300000) * 0.05;
-            breakdown.push({ bracket: '₹3L - ₹6L', rate: 5, amount: (annualIncome - 300000) * 0.05 / 4 });
-          }
-
-          federalTax = Math.round(annualTax / 4);
-          selfEmploymentTax = Math.round(netIncome * 0.05);
-        } else {
-          const annualIncome = netIncome * 4;
-          let annualFedTax = 0;
-
-          if (annualIncome > 100000) {
-            annualFedTax = 16290 + (annualIncome - 100000) * 0.24;
-            breakdown.push({ bracket: '24% Bracket', rate: 24, amount: (annualIncome - 100000) * 0.24 / 4 });
-          } else if (annualIncome > 47150) {
-            annualFedTax = 5426 + (annualIncome - 47150) * 0.22;
-            breakdown.push({ bracket: '22% Bracket', rate: 22, amount: (annualIncome - 47150) * 0.22 / 4 });
-          } else if (annualIncome > 11600) {
-            annualFedTax = 1160 + (annualIncome - 11600) * 0.12;
-            breakdown.push({ bracket: '12% Bracket', rate: 12, amount: (annualIncome - 11600) * 0.12 / 4 });
-          } else {
-            annualFedTax = annualIncome * 0.10;
-            breakdown.push({ bracket: '10% Bracket', rate: 10, amount: annualFedTax / 4 });
-          }
-
-          federalTax = Math.round(annualFedTax / 4);
-          stateTax = Math.round(netIncome * 0.05);
-          selfEmploymentTax = Math.round(netIncome * 0.153);
-        }
-
-        const totalEstimatedTax = federalTax + stateTax + selfEmploymentTax;
-        const effectiveTaxRate = grossIncome > 0 ? Number(((totalEstimatedTax / grossIncome) * 100).toFixed(1)) : 0;
-
-        const result: TaxEstimateResult = {
-          country: params.country,
-          state: params.state,
-          filingStatus: params.filingStatus,
-          quarter: params.quarter,
-          grossIncome,
-          totalDeductions,
-          taxableIncome: netIncome,
-          federalTax,
-          stateTax,
-          selfEmploymentTax,
-          totalEstimatedTax,
-          effectiveTaxRate,
-          breakdown
-        };
-
-        return of(result);
+        return of(this.calculateFallbackTax(params, year));
       })
     );
   }
 
+  getTaxSummary(year: number): Observable<TaxEstimateResult> {
+    return this.http.get<any>(
+      `${this.apiUrl}/tax/summary/${year}`
+    ).pipe(
+      map((response): TaxEstimateResult => {
+        const data = response?.data || response || {};
+
+        const params: TaxCalculationParams = {
+          country: data.country || 'India',
+          state: data.state,
+          filingStatus: data.filingStatus || 'single',
+          quarter: data.quarter || 'Q1',
+          grossIncome: Number(
+            data.grossIncome ?? data.total_income ?? 0
+          ),
+          businessExpenses: 0,
+          retirementContributions: 0,
+          healthInsurancePremiums: 0,
+          homeOfficeDeduction: 0
+        };
+
+        return this.normalizeTaxResult(data, params, year);
+      }),
+
+      catchError(() =>
+        of({
+          year,
+          total_income: 0,
+          total_expenses: 0,
+          taxable_income: 0,
+          estimated_tax: 0,
+          grossIncome: 0,
+          totalDeductions: 0,
+          taxableIncome: 0,
+          federalTax: 0,
+          stateTax: 0,
+          selfEmploymentTax: 0,
+          totalEstimatedTax: 0,
+          effectiveTaxRate: 0,
+          breakdown: []
+        })
+      )
+    );
+  }
+
   getTaxReminders(): Observable<TaxReminder[]> {
-    return this.http.get<any>(`${this.apiUrl}/reminders`).pipe(
-      map(response => response.data || response),
+    return this.http.get<any>(
+      `${this.apiUrl}/alerts`
+    ).pipe(
+      map((response): TaxReminder[] => {
+        const alerts = response?.data || response || [];
+
+        if (!Array.isArray(alerts)) {
+          return [];
+        }
+
+        return alerts.map((alert: any): TaxReminder => {
+          const type: 'reminder' | 'payment' =
+            String(
+              alert.type ||
+              alert.alert_type ||
+              ''
+            ).toLowerCase().includes('payment')
+              ? 'payment'
+              : 'reminder';
+
+          return {
+            id: alert.id,
+
+            title:
+              alert.title ||
+              'Tax Reminder',
+
+            quarter:
+              this.getQuarterFromAlert(
+                alert.title || '',
+                alert.alert_type
+              ),
+
+            dueDate:
+              alert.due_date ||
+              alert.dueDate ||
+              '',
+
+            reminderDate:
+              alert.reminder_date ||
+              alert.due_date ||
+              alert.dueDate ||
+              '',
+
+            description:
+              alert.message ||
+              alert.description ||
+              '',
+
+            estimatedTaxAmount:
+              alert.estimated_tax_amount ?? null,
+
+            currencySymbol:
+              alert.currencySymbol || '₹',
+
+            type,
+
+            status:
+              this.getAlertStatus(alert),
+
+            severity:
+              alert.severity,
+
+            alert_type:
+              alert.alert_type,
+
+            due_date:
+              alert.due_date,
+
+            is_read:
+              alert.is_read,
+
+            is_resolved:
+              alert.is_resolved
+          };
+        });
+      }),
+
       catchError(() => {
         const reminders: TaxReminder[] = [
           {
-            id: '1',
-            title: 'Reminder: Q1 Estimated Tax Payment',
+            id: 1,
+            title: 'Q1 Estimated Tax Payment',
             quarter: 'Q1',
-            dueDate: 'April 15, 2026',
-            reminderDate: 'April 1, 2026',
-            description: 'First quarter estimated tax payment due for Jan-Mar earnings.',
+            dueDate: 'April 15',
+            reminderDate: 'April 1',
+            description: 'First quarter estimated tax payment reminder.',
             type: 'reminder',
-            status: 'completed'
+            status: 'completed',
+            currencySymbol: '₹'
           },
           {
-            id: '2',
-            title: 'Q1 Estimated Tax Payment Due',
-            quarter: 'Q1',
-            dueDate: 'April 15, 2026',
-            reminderDate: 'April 15, 2026',
-            description: 'Submit your Q1 tax payment to tax authorities.',
-            type: 'payment',
-            status: 'completed'
-          },
-          {
-            id: '3',
-            title: 'Reminder: Q2 Estimated Tax Payment',
-            quarter: 'Q2',
-            dueDate: 'June 15, 2026',
-            reminderDate: 'June 1, 2026',
-            description: 'Reminder for upcoming Q2 estimated tax payment due on June 15.',
-            type: 'reminder',
-            status: 'due_soon'
-          },
-          {
-            id: '4',
+            id: 2,
             title: 'Q2 Estimated Tax Payment',
             quarter: 'Q2',
-            dueDate: 'June 15, 2026',
-            reminderDate: 'June 15, 2026',
-            description: 'Second quarter estimated tax payment due.',
+            dueDate: 'June 15',
+            reminderDate: 'June 1',
+            description: 'Second quarter estimated tax payment reminder.',
             type: 'payment',
-            status: 'upcoming'
+            status: 'due_soon',
+            currencySymbol: '₹'
           },
           {
-            id: '5',
-            title: 'Reminder: Q3 Estimated Tax Payment',
-            quarter: 'Q3',
-            dueDate: 'September 15, 2026',
-            reminderDate: 'September 1, 2026',
-            description: 'Reminder for upcoming Q3 estimated tax payment due on Sep 15.',
-            type: 'reminder',
-            status: 'upcoming'
-          },
-          {
-            id: '6',
+            id: 3,
             title: 'Q3 Estimated Tax Payment',
             quarter: 'Q3',
-            dueDate: 'September 15, 2026',
-            reminderDate: 'September 15, 2026',
-            description: 'Third quarter estimated tax payment due.',
-            type: 'payment',
-            status: 'upcoming'
+            dueDate: 'September 15',
+            reminderDate: 'September 1',
+            description: 'Third quarter estimated tax payment reminder.',
+            type: 'reminder',
+            status: 'upcoming',
+            currencySymbol: '₹'
           },
           {
-            id: '7',
-            title: 'Reminder: Q4 Estimated Tax Payment',
+            id: 4,
+            title: 'Q4 Estimated Tax Payment',
             quarter: 'Q4',
-            dueDate: 'January 15, 2027',
-            reminderDate: 'January 1, 2027',
-            description: 'Fourth quarter estimated tax payment due.',
-            type: 'reminder',
-            status: 'upcoming'
+            dueDate: 'January 15',
+            reminderDate: 'January 1',
+            description: 'Fourth quarter estimated tax payment reminder.',
+            type: 'payment',
+            status: 'upcoming',
+            currencySymbol: '₹'
           }
         ];
 
@@ -226,9 +273,343 @@ export class TaxEstimatorService {
     );
   }
 
-  updateReminderStatus(id: string, status: string = 'completed'): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/reminders/${id}/status`, { status }).pipe(
+  updateReminderStatus(
+    id: string | number,
+    status: string = 'completed'
+  ): Observable<any> {
+
+    if (status === 'completed') {
+      return this.http.put<any>(
+        `${this.apiUrl}/alerts/${id}/resolve`,
+        {}
+      ).pipe(
+        catchError(() => of({ success: true }))
+      );
+    }
+
+    return this.http.put<any>(
+      `${this.apiUrl}/alerts/${id}/read`,
+      {}
+    ).pipe(
       catchError(() => of({ success: true }))
     );
+  }
+
+  markReminderAsRead(
+    id: string | number
+  ): Observable<any> {
+
+    return this.http.put<any>(
+      `${this.apiUrl}/alerts/${id}/read`,
+      {}
+    );
+  }
+
+  markReminderAsResolved(
+    id: string | number
+  ): Observable<any> {
+
+    return this.http.put<any>(
+      `${this.apiUrl}/alerts/${id}/resolve`,
+      {}
+    );
+  }
+
+  deleteReminder(
+    id: string | number
+  ): Observable<any> {
+
+    return this.http.delete<any>(
+      `${this.apiUrl}/alerts/${id}`
+    );
+  }
+
+  private normalizeTaxResult(
+    data: any,
+    params: TaxCalculationParams,
+    year: number
+  ): TaxEstimateResult {
+
+    const grossIncome = Number(
+      data.grossIncome ??
+      data.total_income ??
+      params.grossIncome ??
+      0
+    );
+
+    const totalDeductions = Number(
+      data.totalDeductions ??
+      data.total_expenses ??
+      (
+        Number(params.businessExpenses || 0) +
+        Number(params.retirementContributions || 0) +
+        Number(params.healthInsurancePremiums || 0) +
+        Number(params.homeOfficeDeduction || 0)
+      )
+    );
+
+    const taxableIncome = Number(
+      data.taxableIncome ??
+      data.taxable_income ??
+      Math.max(0, grossIncome - totalDeductions)
+    );
+
+    const totalEstimatedTax = Number(
+      data.totalEstimatedTax ??
+      data.estimated_tax ??
+      0
+    );
+
+    const federalTax = Number(
+      data.federalTax ?? totalEstimatedTax
+    );
+
+    const stateTax = Number(
+      data.stateTax ?? 0
+    );
+
+    const selfEmploymentTax = Number(
+      data.selfEmploymentTax ?? 0
+    );
+
+    const effectiveTaxRate =
+      data.effectiveTaxRate !== undefined
+        ? Number(data.effectiveTaxRate)
+        : grossIncome > 0
+          ? Number(
+            (
+              totalEstimatedTax / grossIncome * 100
+            ).toFixed(1)
+          )
+          : 0;
+
+    return {
+      year: Number(data.year ?? year),
+
+      total_income: Number(
+        data.total_income ?? grossIncome
+      ),
+
+      total_expenses: Number(
+        data.total_expenses ?? totalDeductions
+      ),
+
+      taxable_income: Number(
+        data.taxable_income ?? taxableIncome
+      ),
+
+      estimated_tax: Number(
+        data.estimated_tax ?? totalEstimatedTax
+      ),
+
+      country:
+        data.country ?? params.country,
+
+      state:
+        data.state ?? params.state,
+
+      filingStatus:
+        data.filingStatus ?? params.filingStatus,
+
+      quarter:
+        data.quarter ?? params.quarter,
+
+      grossIncome,
+      totalDeductions,
+      taxableIncome,
+
+      federalTax,
+      stateTax,
+      selfEmploymentTax,
+      totalEstimatedTax,
+      effectiveTaxRate,
+
+      breakdown:
+        Array.isArray(data.breakdown)
+          ? data.breakdown
+          : []
+    };
+  }
+
+  private calculateFallbackTax(
+    params: TaxCalculationParams,
+    year: number
+  ): TaxEstimateResult {
+
+    const grossIncome = Number(params.grossIncome) || 0;
+
+    const totalDeductions =
+      (Number(params.businessExpenses) || 0) +
+      (Number(params.retirementContributions) || 0) +
+      (Number(params.healthInsurancePremiums) || 0) +
+      (Number(params.homeOfficeDeduction) || 0);
+
+    const taxableIncome = Math.max(
+      0,
+      grossIncome - totalDeductions
+    );
+
+    let federalTax = 0;
+    let stateTax = 0;
+    let selfEmploymentTax = 0;
+
+    if (params.country === 'India') {
+
+      if (taxableIncome <= 300000) {
+        federalTax = 0;
+      } else if (taxableIncome <= 600000) {
+        federalTax = (taxableIncome - 300000) * 0.05;
+      } else if (taxableIncome <= 900000) {
+        federalTax =
+          15000 +
+          (taxableIncome - 600000) * 0.10;
+      } else if (taxableIncome <= 1200000) {
+        federalTax =
+          45000 +
+          (taxableIncome - 900000) * 0.15;
+      } else if (taxableIncome <= 1500000) {
+        federalTax =
+          90000 +
+          (taxableIncome - 1200000) * 0.20;
+      } else {
+        federalTax =
+          150000 +
+          (taxableIncome - 1500000) * 0.30;
+      }
+
+      selfEmploymentTax = taxableIncome * 0.05;
+
+    } else {
+
+      federalTax = taxableIncome * 0.12;
+      stateTax =
+        params.country === 'United States'
+          ? taxableIncome * 0.05
+          : 0;
+
+      selfEmploymentTax = taxableIncome * 0.153;
+    }
+
+    const totalEstimatedTax =
+      federalTax +
+      stateTax +
+      selfEmploymentTax;
+
+    const effectiveTaxRate =
+      grossIncome > 0
+        ? Number(
+          (
+            totalEstimatedTax / grossIncome * 100
+          ).toFixed(1)
+        )
+        : 0;
+
+    return {
+      year,
+
+      total_income: grossIncome,
+      total_expenses: totalDeductions,
+      taxable_income: taxableIncome,
+      estimated_tax: totalEstimatedTax,
+
+      country: params.country,
+      state: params.state,
+      filingStatus: params.filingStatus,
+      quarter: params.quarter,
+
+      grossIncome,
+      totalDeductions,
+      taxableIncome,
+
+      federalTax,
+      stateTax,
+      selfEmploymentTax,
+      totalEstimatedTax,
+      effectiveTaxRate,
+
+      breakdown: []
+    };
+  }
+
+  private getQuarterFromAlert(
+    title: string,
+    alertType?: string
+  ): string {
+
+    const text =
+      `${title || ''} ${alertType || ''}`
+        .toUpperCase();
+
+    if (
+      text.includes('Q1') ||
+      text.includes('QUARTER 1')
+    ) {
+      return 'Q1';
+    }
+
+    if (
+      text.includes('Q2') ||
+      text.includes('QUARTER 2')
+    ) {
+      return 'Q2';
+    }
+
+    if (
+      text.includes('Q3') ||
+      text.includes('QUARTER 3')
+    ) {
+      return 'Q3';
+    }
+
+    if (
+      text.includes('Q4') ||
+      text.includes('QUARTER 4')
+    ) {
+      return 'Q4';
+    }
+
+    return '';
+  }
+
+  private getAlertStatus(
+    alert: any
+  ): 'upcoming' | 'due_soon' | 'completed' {
+
+    if (
+      alert.is_resolved === 1 ||
+      alert.is_resolved === true
+    ) {
+      return 'completed';
+    }
+
+    const dateValue =
+      alert.due_date ||
+      alert.dueDate;
+
+    if (!dateValue) {
+      return 'upcoming';
+    }
+
+    const dueDate = new Date(dateValue);
+
+    if (Number.isNaN(dueDate.getTime())) {
+      return 'upcoming';
+    }
+
+    const today = new Date();
+
+    const difference =
+      dueDate.getTime() -
+      today.getTime();
+
+    const daysRemaining = Math.ceil(
+      difference / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysRemaining <= 30) {
+      return 'due_soon';
+    }
+
+    return 'upcoming';
   }
 }
