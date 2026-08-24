@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const taxRoute = require("./routes/taxRoute");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/budgets", budgetRoute);
 // app.use("/api/spending", spendingRoutes);
 app.use("/api/categories", categoryRoute);
+app.use("/api/tax", taxRoute);
 
 app.get("/", (req, res) => {
     res.send("TaxPal Backend is Running...");

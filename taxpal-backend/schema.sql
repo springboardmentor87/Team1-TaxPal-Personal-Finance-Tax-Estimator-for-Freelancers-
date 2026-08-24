@@ -63,4 +63,40 @@ CREATE TABLE IF NOT EXISTS categories (
     UNIQUE KEY unique_user_category_type
         (user_id, name, type)
 );
+CREATE TABLE IF NOT EXISTS tax_estimates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    quarter VARCHAR(20) NOT NULL,
+    estimated_tax DECIMAL(12,2) NOT NULL DEFAULT 0,
+    due_date DATE NOT NULL,
+    state VARCHAR(50) DEFAULT 'Upcoming',
+    filing_status VARCHAR(50) DEFAULT 'Pending',
+
+    gross_income_for_quarter DECIMAL(12,2) DEFAULT 0,
+    business_expenses DECIMAL(12,2) DEFAULT 0,
+    retirement_contribution DECIMAL(12,2) DEFAULT 0,
+    health_insurance_premiums DECIMAL(12,2) DEFAULT 0,
+    home_office_deduction DECIMAL(12,2) DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS alerts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    message VARCHAR(500) NOT NULL,
+    alert_date DATE NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
 

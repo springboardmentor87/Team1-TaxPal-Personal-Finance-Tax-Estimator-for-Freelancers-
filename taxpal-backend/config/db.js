@@ -65,6 +65,46 @@ sqliteDb.serialize(() => {
     `);
 });
 
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS tax_estimates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            country TEXT NOT NULL,
+            quarter TEXT NOT NULL,
+            estimated_tax REAL NOT NULL DEFAULT 0,
+            due_date TEXT NOT NULL,
+            state TEXT DEFAULT 'Upcoming',
+            filing_status TEXT DEFAULT 'Pending',
+
+            gross_income_for_quarter REAL DEFAULT 0,
+            business_expenses REAL DEFAULT 0,
+            retirement_contribution REAL DEFAULT 0,
+            health_insurance_premiums REAL DEFAULT 0,
+            home_office_deduction REAL DEFAULT 0,
+
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
+                ON DELETE CASCADE
+        );
+    `);
+
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS alerts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            message TEXT NOT NULL,
+            alert_date TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
+
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
+                ON DELETE CASCADE
+        );
+    `);
+
 console.log("SQLite Database initialized at:", sqlitePath);
 
 const mysqlPool = mysql.createPool({
