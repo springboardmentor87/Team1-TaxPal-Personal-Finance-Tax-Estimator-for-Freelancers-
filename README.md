@@ -1,78 +1,76 @@
 # 💰 TaxPal – Personal Finance & Tax Estimator for Freelancers
 
-TaxPal is a professional, full-stack personal finance and real-time tax estimation application crafted specifically for freelancers, consultants, and gig workers. It provides an intuitive dashboard for income and expense tracking, tax liability estimations, interactive visual analytics, and full database persistence powered by Node.js, Express, and MySQL.
+TaxPal is a modern, full-stack personal finance and real-time tax estimation application crafted specifically for freelancers, gig workers, and self-employed professionals. It provides categorized transaction tracking, monthly budgeting limits with visual progress, regional tax estimation based on slabs, and calendar tracking for quarterly tax deadlines.
+
+---
+
+## 📌 Project Milestones Status
+
+| Milestone | Scope & Deliverables | Status |
+| :--- | :--- | :---: |
+| **Milestone 1: Transaction Logging (Weeks 1–2)** | User Auth (JWT/Bcrypt), Manual Income & Expense Logging, Core Dashboard with KPI cards & Transaction Lists. | ✅ **Completed** |
+| **Milestone 2: Categorization & Budgeting (Weeks 3–4)** | Auto & Manual Category Suggestions, Monthly Spending Limits, Visual Budget Progress & Health Tracking, Category Management. | ✅ **Completed** |
+| **Milestone 3: Tax Estimation (Weeks 5–6)** | Regional Tax Calculation (US & India Tax Slabs, State Tax, Deductions), Quarterly Tax Due Date Calendar & Reminder Alerts. | ✅ **Completed** |
+| **Milestone 4: Reporting & Export (Weeks 7–8)** | Financial Statement Summaries (Income Statement, Expense Report), Monthly/Quarterly Breakdowns, PDF & CSV Export. | ⏳ *In Progress* |
 
 ---
 
 ## 🏗️ System Architecture
 
-TaxPal is built as an end-to-end full-stack solution featuring a responsive Angular SPA frontend, a Node.js/Express REST API backend, and a relational MySQL database layer.
-
 ```
-┌───────────────────────────────┐     HTTP REST API      ┌───────────────────────────────┐      SQL Queries      ┌───────────────────────────────┐
-│     Angular 21 Frontend       │ ────────────────────>  │    Node.js / Express Backend  │ ────────────────────> │        MySQL Database         │
-│  (taxpal-frontend - Port 4200)│ <────────────────────  │  (taxpal-backend - Port 8080) │ <──────────────────── │           (taxpal)            │
-└───────────────────────────────┘       JWT Auth         └───────────────────────────────┘        mysql2         └───────────────────────────────┘
+┌────────────────────────────────┐         HTTP REST API        ┌────────────────────────────────┐       SQL Persistence      ┌────────────────────────────────┐
+│      Angular 21 Frontend       │ ───────────────────────────> │    Node.js / Express Backend   │ ─────────────────────────> │     MySQL / SQLite Database    │
+│ (taxpal-frontend - Port 4200)  │ <─────────────────────────── │  (taxpal-backend - Port 8080)  │ <───────────────────────── │            (taxpal)            │
+└────────────────────────────────┘            JWT Auth          └────────────────────────────────┘      mysql2 / sqlite3      └────────────────────────────────┘
 ```
 
 ---
 
 ## 🚀 Key Features
 
-### 🔐 Secure Authentication & User Management
-* **JWT-Based Authentication**: Full authentication workflow using JSON Web Tokens.
-* **Login & Registration**: User signup and login connected directly to the Express backend and MySQL database.
-* **Password Encryption**: Secure password hashing implemented using `bcrypt`.
-* **Route Guards**: Angular `AuthGuard` protects private routes and redirects unauthenticated users to login.
+### 🔐 1. Authentication & User Profile (Milestone 1)
+* **JWT-Based Authentication**: Secure registration and login flows with encrypted passwords via `bcrypt`.
+* **User Profile**: Regional country configuration, income bracket classification, and profile management.
+* **Angular Auth Guards**: Protects all internal application routes.
 
-### 📊 Interactive Financial Dashboard
-* **KPI Metric Cards**: Real-time calculations for *Monthly Income*, *Monthly Expenses*, *Estimated Tax Due* (15% rate), and *Savings Rate*.
-* **Dynamic Timeframe Analytics**: Income vs. Expense bar charts filterable by **Month**, **Quarter**, and **Year** powered by Chart.js.
-* **Categorized Expense Breakdown**: Interactive doughnut chart displaying monthly spending habits.
-* **Recent Activity Stream**: Instant display of latest logged financial transactions.
+### 💵 2. Transaction Management & Dashboard (Milestone 1)
+* **Income & Expense Entry**: Record transactions with description, amount, category, date, and notes.
+* **KPI Dashboard**: Real-time summaries of *Monthly Income*, *Monthly Expenses*, *Estimated Tax Due*, and *Savings Rate*.
+* **Interactive Visualizations**: Timeframe-filtered Income vs. Expense bar charts and Category Spending doughnut charts using Chart.js.
 
-### 💵 Real-Time Transaction Management & Currency Localization
-* **Full CRUD Operations**: Modal dialogs to log incomes and expenses with categories, descriptions, amounts, and dates.
-* **Rupee (₹) Currency Localization**: Native support for Indian Rupees (`₹`) formatted across all forms, tables, and chart axes.
-* **Search, Sort & Filter**: Advanced transaction history workspace to filter and audit records.
+### 📊 3. Smart Categorization & Budgeting (Milestone 2)
+* **Auto-Categorization**: Intelligent category keyword suggestion engine on transaction entry.
+* **Budget Limits**: Define monthly spending ceilings per category.
+* **Visual Progress Tracking**: Real-time budget health meters (*Good / Warning / Danger*) with remaining budget calculations.
+* **Category Management**: Create, edit, customize colors, and organize income and expense categories.
 
-### 🗄️ Relational MySQL Persistence
-* **Relational Schema**: Structured MySQL tables (`users`, `transactions`) configured with foreign keys and cascading deletes.
+### 🏛️ 4. Regional Tax Estimation Engine & Calendar (Milestone 3)
+* **Tax Calculation by Slabs**:
+  * **India**: New tax regime slabs (0%, 5%, 10%, 15%, 20%, 30%) + cess and freelance business expenses.
+  * **United States**: Federal brackets (10%, 12%, 22%, 24%) + State Tax (California, New York, Texas 0%, Florida 0%) + Self-Employment Tax (15.3%).
+* **Deduction Engine**: Factor in Business Expenses, Retirement Contributions (SEP IRA, Solo 401(k), PPF), Health Insurance Premiums, and Home Office deductions.
+* **Tax Calendar & Reminders**: Visual schedule of Q1–Q4 estimated tax deadlines with *Upcoming*, *Due Soon*, and *Mark Paid* status workflows.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Frontend (`taxpal-frontend`)**
-* **Framework**: Angular v21 (Standalone Components)
-* **Language**: TypeScript
-* **State & HTTP**: RxJS, Angular HttpClient
-* **Styling**: Vanilla CSS (Custom Design Tokens, Responsive Layouts, Dynamic Themes)
-* **Visualizations**: Chart.js / Canvas
-
-### **Backend (`taxpal-backend`)**
-* **Runtime**: Node.js & Express.js
-* **Authentication**: JSON Web Tokens (`jsonwebtoken`), `bcrypt`
-* **Database Driver**: `mysql2`
-
-### **Database Layer**
-* **RDBMS**: MySQL
-* **Database Name**: `taxpal`
+* **Frontend**: Angular v21 (Standalone Components, RxJS, Reactive Forms, Chart.js, Vanilla CSS Design System)
+* **Backend**: Node.js, Express.js, JWT, bcrypt
+* **Database**: MySQL / SQLite (`schema.sql` supporting `users`, `transactions`, `budgets`, `categories`, `tax_calculations`, `tax_summaries`, `tax_events`, `alerts`)
 
 ---
 
 ## 💻 Getting Started
 
 ### Prerequisites
-* **Node.js** (v18+ recommended) & **npm**
-* **MySQL Server** running locally or remotely
+* **Node.js** (v18+) & **npm**
+* **MySQL Server** (Optional – SQLite is built-in as local fallback)
 
 ---
 
-### 1. Database Setup
-
-Execute [`taxpal-backend/schema.sql`](file:///c:/Springbord/taxpal-backend/schema.sql) in your MySQL environment:
-
+### 1. Database Setup (Optional for MySQL)
+Execute [`taxpal-backend/schema.sql`](file:///c:/Springbord/taxpal-backend/schema.sql) in MySQL:
 ```sql
 mysql -u root -p < taxpal-backend/schema.sql
 ```
@@ -80,60 +78,32 @@ mysql -u root -p < taxpal-backend/schema.sql
 ---
 
 ### 2. Backend Setup (`taxpal-backend`)
-
-1. Navigate to the backend directory:
-   ```bash
-   cd taxpal-backend
-   ```
-2. Install backend dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in `taxpal-backend/`:
-   ```env
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_mysql_password
-   DB_NAME=taxpal
-   JWT_SECRET=your_secret_key
-   ```
-4. Start the backend server:
-   ```bash
-   npm start
-   ```
-   *The server will run on `http://localhost:5000`.*
+```bash
+cd taxpal-backend
+npm install
+npm start
+```
+*Backend runs on `http://localhost:8080`.*
 
 ---
 
 ### 3. Frontend Setup (`taxpal-frontend`)
-
-1. Open a new terminal and navigate to the frontend directory:
-   ```bash
-   cd taxpal-frontend
-   ```
-2. Install frontend dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Angular development server:
-   ```bash
-   npm start
-   ```
-4. Open **`http://localhost:4200`** in your browser.
+```bash
+cd taxpal-frontend
+npm install
+npm start
+```
+*Open **`http://localhost:4200`** in your browser.*
 
 ---
 
-## 📦 Production Build & Testing
+## 📦 Build & Test
 
-### Build Frontend
 ```bash
+# Build Angular Frontend
 cd taxpal-frontend
 npm run build
-```
 
-### Run Tests
-```bash
-cd taxpal-frontend
+# Run Tests
 npm test
 ```

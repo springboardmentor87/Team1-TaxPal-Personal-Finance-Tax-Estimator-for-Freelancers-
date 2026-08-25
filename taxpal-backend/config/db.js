@@ -64,6 +64,7 @@ sqliteDb.serialize(() => {
         );
     `);
 
+    // Tax Estimator
     sqliteDb.run(`
         CREATE TABLE IF NOT EXISTS tax_assessments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,6 +84,64 @@ sqliteDb.serialize(() => {
             net_income REAL NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+    `);
+
+    // Tax Calculations
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS tax_calculations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            year INTEGER NOT NULL,
+            country TEXT NOT NULL,
+            state TEXT,
+            filing_status TEXT NOT NULL,
+            quarter TEXT NOT NULL,
+            gross_income REAL NOT NULL,
+            business_expenses REAL DEFAULT 0,
+            retirement_contributions REAL DEFAULT 0,
+            health_insurance_premiums REAL DEFAULT 0,
+            home_office_deduction REAL DEFAULT 0,
+            total_deductions REAL DEFAULT 0,
+            taxable_income REAL DEFAULT 0,
+            federal_tax REAL DEFAULT 0,
+            state_tax REAL DEFAULT 0,
+            self_employment_tax REAL DEFAULT 0,
+            total_estimated_tax REAL DEFAULT 0,
+            effective_tax_rate REAL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+
+    // Tax Summaries
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS tax_summaries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            year INTEGER NOT NULL,
+            total_income REAL DEFAULT 0,
+            total_expenses REAL DEFAULT 0,
+            taxable_income REAL DEFAULT 0,
+            estimated_tax REAL DEFAULT 0,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+
+    // Tax Events
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS tax_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            title TEXT NOT NULL,
+            quarter TEXT,
+            due_date TEXT NOT NULL,
+            reminder_date TEXT,
+            description TEXT,
+            estimated_tax_amount REAL,
+            currency_symbol TEXT DEFAULT '$',
+            type TEXT DEFAULT 'payment',
+            status TEXT DEFAULT 'upcoming',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     `);
 });
@@ -118,28 +177,46 @@ const db = {
             callback = params;
             params = [];
         }
+
         params = params || [];
 
         if (!useSQLite) {
             mysqlPool.query(sql, params, (err, results, fields) => {
-                if (err && (err.code === "ECONNREFUSED" || err.code === "ENOTFOUND")) {
-                    console.log("Switching query execution to SQLite fallback...");
+                if (
+                    err &&
+                    (err.code === "ECONNREFUSED" ||
+                        err.code === "ENOTFOUND")
+                ) {
+                    console.log(
+                        "Switching query execution to SQLite fallback..."
+                    );
+
                     useSQLite = true;
                     return db.query(sql, params, callback);
                 }
-                if (callback) callback(err, results, fields);
+
+                if (callback) {
+                    callback(err, results, fields);
+                }
             });
+
             return;
         }
 
         // SQLite Execution Logic
         const trimmedSql = sql.trim();
-        const isSelect = /^SELECT/i.test(trimmedSql) || /^SHOW/i.test(trimmedSql);
+
+        const isSelect =
+            /^SELECT/i.test(trimmedSql) ||
+            /^SHOW/i.test(trimmedSql);
+
         const isInsert = /^INSERT/i.test(trimmedSql);
 
         if (isSelect) {
             sqliteDb.all(sql, params, (err, rows) => {
-                if (callback) callback(err, rows || []);
+                if (callback) {
+                    callback(err, rows || []);
+                }
             });
         } else if (isInsert) {
             sqliteDb.run(sql, params, function (err) {
@@ -163,4 +240,3 @@ const db = {
 };
 
 module.exports = db;
-

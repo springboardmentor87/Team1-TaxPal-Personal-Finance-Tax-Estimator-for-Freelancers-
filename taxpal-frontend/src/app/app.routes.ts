@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard';
 import { TransactionListComponent } from './transactions/transaction-list';
 import { BudgetListComponent } from './budgets/budget-list';
 import { CategoryListComponent } from './categories/category-list';
+import { TaxEstimatorComponent } from './tax-estimator/tax-estimator';
 import { ComingSoonComponent } from './shared/coming-soon';
 import { TaxEstimatorComponent } from './tax-estimator/tax-estimator';
 import { authGuard } from './auth/auth.guard';
