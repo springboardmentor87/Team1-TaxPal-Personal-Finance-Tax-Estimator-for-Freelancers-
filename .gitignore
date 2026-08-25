@@ -1,0 +1,24 @@
+# Environment variables
+.env
+.env.*
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Angular build files
+dist/
+**/dist/
+
+# Angular cache
+.angular/
+**/.angular/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

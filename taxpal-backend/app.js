@@ -14,8 +14,7 @@ const dashboardRoutes = require("./routes/dashboardRoute");
 const budgetRoute = require("./routes/budgetRoute");
 // const spendingRoutes = require("./routes/spendingRoute");
 const categoryRoute = require("./routes/categoryRoute");
-
-
+const taxEstimatorRoute = require("./routes/taxEstimatorRoute");
 
 app.use(cors());
 app.use(express.json());
@@ -26,6 +25,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/budgets", budgetRoute);
 // app.use("/api/spending", spendingRoutes);
 app.use("/api/categories", categoryRoute);
+app.use("/api/tax-estimator", taxEstimatorRoute);
+
 
 app.get("/", (req, res) => {
     res.send("TaxPal Backend is Running...");

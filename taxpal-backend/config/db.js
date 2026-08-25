@@ -63,6 +63,28 @@ sqliteDb.serialize(() => {
             UNIQUE(user_id, name, type)
         );
     `);
+
+    sqliteDb.run(`
+        CREATE TABLE IF NOT EXISTS tax_assessments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            financial_year TEXT NOT NULL,
+            gross_income REAL NOT NULL,
+            business_expenses REAL NOT NULL,
+            other_deductions REAL NOT NULL,
+            taxable_income REAL NOT NULL,
+            old_regime_tax REAL NOT NULL,
+            new_regime_tax REAL NOT NULL,
+            selected_regime TEXT NOT NULL,
+            estimated_tax REAL NOT NULL,
+            cess REAL NOT NULL,
+            total_tax REAL NOT NULL,
+            effective_tax_rate REAL NOT NULL,
+            net_income REAL NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+    `);
 });
 
 console.log("SQLite Database initialized at:", sqlitePath);
