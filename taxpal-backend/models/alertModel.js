@@ -1,5 +1,17 @@
 const db = require("../config/db");
 
+const executeQuery = (sql, params = []) => {
+    return new Promise((resolve, reject) => {
+        db.query(sql, params, (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+
+            resolve(results);
+        });
+    });
+};
+
 const AlertModel = {
 
     createAlert: async (alertData) => {
@@ -10,22 +22,24 @@ const AlertModel = {
             message,
             severity,
             alert_type,
-            due_date
+            due_date,
+            estimated_tax_amount
         } = alertData;
 
         const query = `
-            INSERT INTO alerts (
+            INSERT INTO tax_alerts (
                 user_id,
                 title,
                 message,
                 severity,
                 alert_type,
-                due_date
+                due_date,
+                estimated_tax_amount
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const [result] = await db.execute(
+        const result = await executeQuery(
             query,
             [
                 user_id,
@@ -33,7 +47,8 @@ const AlertModel = {
                 message,
                 severity,
                 alert_type,
-                due_date
+                due_date,
+                estimated_tax_amount || null
             ]
         );
 
@@ -48,12 +63,12 @@ const AlertModel = {
 
         const query = `
             SELECT *
-            FROM alerts
+            FROM tax_alerts
             WHERE user_id = ?
             ORDER BY due_date ASC
         `;
 
-        const [rows] = await db.execute(
+        const rows = await executeQuery(
             query,
             [user_id]
         );
@@ -65,13 +80,13 @@ const AlertModel = {
     markAsRead: async (id, user_id) => {
 
         const query = `
-            UPDATE alerts
+            UPDATE tax_alerts
             SET is_read = 1
             WHERE id = ?
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const result = await executeQuery(
             query,
             [id, user_id]
         );
@@ -83,13 +98,13 @@ const AlertModel = {
     markAsResolved: async (id, user_id) => {
 
         const query = `
-            UPDATE alerts
+            UPDATE tax_alerts
             SET is_resolved = 1
             WHERE id = ?
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const result = await executeQuery(
             query,
             [id, user_id]
         );
@@ -101,12 +116,12 @@ const AlertModel = {
     deleteAlert: async (id, user_id) => {
 
         const query = `
-            DELETE FROM alerts
+            DELETE FROM tax_alerts
             WHERE id = ?
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const result = await executeQuery(
             query,
             [id, user_id]
         );

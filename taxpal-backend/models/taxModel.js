@@ -44,20 +44,44 @@ const TaxModel = {
 
     createTaxCalculation: async (data) => {
         const query = `
-            INSERT INTO tax_calculations (
-                user_id, year, country, state, filing_status, quarter,
-                gross_income, business_expenses, retirement_contributions,
-                health_insurance_premiums, home_office_deduction, total_deductions,
-                taxable_income, federal_tax, state_tax, self_employment_tax,
-                total_estimated_tax, effective_tax_rate
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+    INSERT INTO tax_calculations (
+        year,
+        country,
+        state,
+        filing_status,
+        quarter,
+        gross_income,
+        business_expenses,
+        retirement_contributions,
+        health_insurance_premiums,
+        home_office_deduction,
+        total_expenses,
+        taxable_income,
+        estimated_tax,
+        federal_tax,
+        state_tax,
+        self_employment_tax,
+        effective_tax_rate
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
         const params = [
-            data.user_id, data.year, data.country, data.state, data.filing_status, data.quarter,
-            data.gross_income, data.business_expenses, data.retirement_contributions,
-            data.health_insurance_premiums, data.home_office_deduction, data.total_deductions,
-            data.taxable_income, data.federal_tax, data.state_tax, data.self_employment_tax,
-            data.total_estimated_tax, data.effective_tax_rate
+            data.year,
+            data.country,
+            data.state,
+            data.filing_status,
+            data.quarter,
+            data.gross_income,
+            data.business_expenses,
+            data.retirement_contributions,
+            data.health_insurance_premiums,
+            data.home_office_deduction,
+            data.total_expenses,
+            data.taxable_income,
+            data.estimated_tax,
+            data.federal_tax,
+            data.state_tax,
+            data.self_employment_tax,
+            data.effective_tax_rate
         ];
 
         return new Promise((resolve, reject) => {

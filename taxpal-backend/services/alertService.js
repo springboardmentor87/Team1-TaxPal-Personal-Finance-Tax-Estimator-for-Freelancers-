@@ -20,7 +20,6 @@ const AlertService = {
         }
 
         const alerts = [
-
             {
                 title: "Quarter 1 Tax Due",
                 message: `Your Quarter 1 tax payment for ${year} is due soon.`,
@@ -28,7 +27,6 @@ const AlertService = {
                 alert_type: "quarterly_tax",
                 due_date: `${year}-06-15`
             },
-
             {
                 title: "Quarter 2 Tax Due",
                 message: `Your Quarter 2 tax payment for ${year} is due soon.`,
@@ -36,7 +34,6 @@ const AlertService = {
                 alert_type: "quarterly_tax",
                 due_date: `${year}-09-15`
             },
-
             {
                 title: "Quarter 3 Tax Due",
                 message: `Your Quarter 3 tax payment for ${year} is due soon.`,
@@ -44,7 +41,6 @@ const AlertService = {
                 alert_type: "quarterly_tax",
                 due_date: `${year}-12-15`
             },
-
             {
                 title: "Quarter 4 Tax Due",
                 message: `Your Quarter 4 tax payment for ${year} is due soon.`,
@@ -52,7 +48,6 @@ const AlertService = {
                 alert_type: "quarterly_tax",
                 due_date: `${Number(year) + 1}-03-15`
             }
-
         ];
 
         const createdAlerts = [];
@@ -71,7 +66,6 @@ const AlertService = {
         return createdAlerts;
     },
 
-
     getUserAlerts: async (user_id) => {
 
         if (!user_id) {
@@ -81,26 +75,13 @@ const AlertService = {
             );
         }
 
-        return await AlertModel.getAlertsByUser(
-            user_id
-        );
+        return await AlertModel.getAlertsByUser(user_id);
     },
-
 
     markAlertAsRead: async (id, user_id) => {
 
-        if (!id) {
-            throw new AppError(
-                "Alert ID is required",
-                400
-            );
-        }
-
         const result =
-            await AlertModel.markAsRead(
-                id,
-                user_id
-            );
+            await AlertModel.markAsRead(id, user_id);
 
         if (result.affectedRows === 0) {
             throw new AppError(
@@ -111,22 +92,11 @@ const AlertService = {
 
         return true;
     },
-
 
     markAlertAsResolved: async (id, user_id) => {
 
-        if (!id) {
-            throw new AppError(
-                "Alert ID is required",
-                400
-            );
-        }
-
         const result =
-            await AlertModel.markAsResolved(
-                id,
-                user_id
-            );
+            await AlertModel.markAsResolved(id, user_id);
 
         if (result.affectedRows === 0) {
             throw new AppError(
@@ -138,21 +108,10 @@ const AlertService = {
         return true;
     },
 
-
     deleteAlert: async (id, user_id) => {
 
-        if (!id) {
-            throw new AppError(
-                "Alert ID is required",
-                400
-            );
-        }
-
         const result =
-            await AlertModel.deleteAlert(
-                id,
-                user_id
-            );
+            await AlertModel.deleteAlert(id, user_id);
 
         if (result.affectedRows === 0) {
             throw new AppError(

@@ -277,9 +277,7 @@ const TaxService = {
         SAVE CALCULATION IN DATABASE
         ============================================
         */
-
         await TaxModel.createTaxCalculation({
-            user_id: user_id || null,
             year: Number(year),
             country,
             state: state || null,
@@ -290,14 +288,12 @@ const TaxService = {
             retirement_contributions: retirement,
             health_insurance_premiums: health,
             home_office_deduction: homeOffice,
-            total_deductions: totalDeductions,
+            total_expenses: totalDeductions,
             taxable_income: taxableIncome,
+            estimated_tax: Number(totalEstimatedTax.toFixed(2)),
             federal_tax: federalTax,
             state_tax: stateTax,
             self_employment_tax: selfEmploymentTax,
-            total_estimated_tax: Number(
-                totalEstimatedTax.toFixed(2)
-            ),
             effective_tax_rate: effectiveTaxRate
         });
 

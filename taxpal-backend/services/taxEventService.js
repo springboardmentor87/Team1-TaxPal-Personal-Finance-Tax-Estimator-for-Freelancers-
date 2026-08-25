@@ -1,9 +1,16 @@
-const TaxEventModel = require("../models/taxEventModel");
-const AppError = require("../utils/AppError");
+const TaxEventModel =
+    require("../models/taxEventModel");
+
+const AppError =
+    require("../utils/AppError");
+
 
 const TaxEventService = {
 
-    createTaxEvent: async (user_id, eventData) => {
+    createTaxEvent: async (
+        user_id,
+        eventData
+    ) => {
 
         if (!user_id) {
             throw new AppError(
@@ -14,32 +21,39 @@ const TaxEventService = {
 
         const {
             title,
-            description,
-            due_date,
             quarter,
-            is_custom
+            due_date
         } = eventData;
 
-        if (!title || !due_date) {
+        if (!title || !quarter || !due_date) {
             throw new AppError(
-                "Title and due date are required",
+                "Title, quarter and due date are required",
                 400
             );
         }
 
+        const year =
+            Number(eventData.year) ||
+            new Date(due_date).getFullYear();
+
         return await TaxEventModel.createTaxEvent({
-
             user_id,
+            year,
             title,
-            description: description || "",
+            quarter,
             due_date,
-            quarter: quarter || null,
-
-            is_custom:
-                is_custom !== undefined
-                    ? is_custom
-                    : 1
-
+            reminder_date:
+                eventData.reminder_date || null,
+            description:
+                eventData.description || "",
+            estimated_tax_amount:
+                eventData.estimated_tax_amount || 0,
+            currency_symbol:
+                eventData.currency_symbol || "$",
+            type:
+                eventData.type || "payment",
+            status:
+                eventData.status || "upcoming"
         });
     },
 
@@ -56,74 +70,188 @@ const TaxEventService = {
             );
         }
 
-        if (!year || isNaN(Number(year))) {
-            throw new AppError(
-                "Valid year is required",
-                400
+        year =
+            Number(year) ||
+            new Date().getFullYear();
+
+        const existingEvents =
+            await TaxEventModel.getExistingQuarterlyEvents(
+                user_id,
+                year
             );
+
+        if (existingEvents.length > 0) {
+            return existingEvents;
         }
+
 
         const events = [
 
+            // Q1
+
             {
-                title: "Quarter 1 Tax Due",
-                description:
-                    `Quarter 1 tax payment due for ${year}`,
-                due_date: `${year}-06-15`,
+                user_id,
+                year,
+                title:
+                    "Reminder: Q1 Estimated Tax Payment",
                 quarter: "Q1",
-                is_custom: 0
+                due_date: `${year}-04-01`,
+                reminder_date: `${year}-04-01`,
+                description:
+                    "Reminder for upcoming Q1 estimated tax payment due on April 15.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "reminder",
+                status: "upcoming"
             },
 
             {
-                title: "Quarter 2 Tax Due",
+                user_id,
+                year,
+                title:
+                    "Q1 Estimated Tax Payment",
+                quarter: "Q1",
+                due_date: `${year}-04-15`,
+                reminder_date: `${year}-04-01`,
                 description:
-                    `Quarter 2 tax payment due for ${year}`,
-                due_date: `${year}-09-15`,
+                    "First quarter estimated tax payment due.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "payment",
+                status: "upcoming"
+            },
+
+
+            // Q2
+
+            {
+                user_id,
+                year,
+                title:
+                    "Reminder: Q2 Estimated Tax Payment",
                 quarter: "Q2",
-                is_custom: 0
+                due_date: `${year}-06-01`,
+                reminder_date: `${year}-06-01`,
+                description:
+                    "Reminder for upcoming Q2 estimated tax payment due on June 15.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "reminder",
+                status: "upcoming"
             },
 
             {
-                title: "Quarter 3 Tax Due",
+                user_id,
+                year,
+                title:
+                    "Q2 Estimated Tax Payment",
+                quarter: "Q2",
+                due_date: `${year}-06-15`,
+                reminder_date: `${year}-06-01`,
                 description:
-                    `Quarter 3 tax payment due for ${year}`,
-                due_date: `${year}-12-15`,
+                    "Second quarter estimated tax payment due.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "payment",
+                status: "upcoming"
+            },
+
+
+            // Q3
+
+            {
+                user_id,
+                year,
+                title:
+                    "Reminder: Q3 Estimated Tax Payment",
                 quarter: "Q3",
-                is_custom: 0
+                due_date: `${year}-09-01`,
+                reminder_date: `${year}-09-01`,
+                description:
+                    "Reminder for upcoming Q3 estimated tax payment due on September 15.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "reminder",
+                status: "upcoming"
             },
 
             {
-                title: "Quarter 4 Tax Due",
+                user_id,
+                year,
+                title:
+                    "Q3 Estimated Tax Payment",
+                quarter: "Q3",
+                due_date: `${year}-09-15`,
+                reminder_date: `${year}-09-01`,
                 description:
-                    `Quarter 4 tax payment due for ${year}`,
-                due_date:
-                    `${Number(year) + 1}-03-15`,
-                quarter: "Q4",
-                is_custom: 0
-            }
+                    "Third quarter estimated tax payment due.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "payment",
+                status: "upcoming"
+            },
 
+
+            // Q4
+
+            {
+                user_id,
+                year,
+                title:
+                    "Reminder: Q4 Estimated Tax Payment",
+                quarter: "Q4",
+                due_date: `${Number(year) + 1}-01-01`,
+                reminder_date:
+                    `${Number(year) + 1}-01-01`,
+                description:
+                    "Reminder for upcoming Q4 estimated tax payment due on January 15.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "reminder",
+                status: "upcoming"
+            },
+
+            {
+                user_id,
+                year,
+                title:
+                    "Q4 Estimated Tax Payment",
+                quarter: "Q4",
+                due_date: `${Number(year) + 1}-01-15`,
+                reminder_date:
+                    `${Number(year) + 1}-01-01`,
+                description:
+                    "Fourth quarter estimated tax payment due.",
+                estimated_tax_amount: 0,
+                currency_symbol: "$",
+                type: "payment",
+                status: "upcoming"
+            }
         ];
+
 
         const createdEvents = [];
 
         for (const event of events) {
 
             const createdEvent =
-                await TaxEventModel.createTaxEvent({
+                await TaxEventModel.createTaxEvent(
+                    event
+                );
 
-                    user_id,
-                    ...event
-
-                });
-
-            createdEvents.push(createdEvent);
+            createdEvents.push(
+                createdEvent
+            );
         }
 
         return createdEvents;
     },
 
 
-    getTaxEvents: async (user_id) => {
+    getTaxEvents: async (
+        user_id,
+        year
+    ) => {
 
         if (!user_id) {
             throw new AppError(
@@ -133,14 +261,16 @@ const TaxEventService = {
         }
 
         return await TaxEventModel.getTaxEventsByUser(
-            user_id
+            user_id,
+            year
         );
     },
 
 
     getTaxEventsByMonth: async (
         user_id,
-        month
+        month,
+        year
     ) => {
 
         if (!user_id) {
@@ -157,9 +287,14 @@ const TaxEventService = {
             );
         }
 
+        if (!year) {
+            year = new Date().getFullYear();
+        }
+
         return await TaxEventModel.getTaxEventsByMonth(
             user_id,
-            month
+            month,
+            year
         );
     },
 
@@ -169,13 +304,6 @@ const TaxEventService = {
         user_id,
         eventData
     ) => {
-
-        if (!id) {
-            throw new AppError(
-                "Tax event ID is required",
-                400
-            );
-        }
 
         const result =
             await TaxEventModel.updateTaxEvent(
@@ -200,13 +328,6 @@ const TaxEventService = {
         user_id
     ) => {
 
-        if (!id) {
-            throw new AppError(
-                "Tax event ID is required",
-                400
-            );
-        }
-
         const result =
             await TaxEventModel.markAsCompleted(
                 id,
@@ -229,13 +350,6 @@ const TaxEventService = {
         user_id
     ) => {
 
-        if (!id) {
-            throw new AppError(
-                "Tax event ID is required",
-                400
-            );
-        }
-
         const result =
             await TaxEventModel.deleteTaxEvent(
                 id,
@@ -251,7 +365,7 @@ const TaxEventService = {
 
         return true;
     }
-
 };
+
 
 module.exports = TaxEventService;

@@ -9,6 +9,7 @@ const authMiddleware =
     require("../middleware/authMiddleware");
 
 
+// Create quarterly alerts
 router.post(
     "/quarterly",
     authMiddleware,
@@ -16,6 +17,7 @@ router.post(
 );
 
 
+// Get all alerts
 router.get(
     "/",
     authMiddleware,
@@ -23,6 +25,7 @@ router.get(
 );
 
 
+// Mark alert as read
 router.patch(
     "/:id/read",
     authMiddleware,
@@ -30,6 +33,7 @@ router.patch(
 );
 
 
+// Mark alert as resolved
 router.patch(
     "/:id/resolve",
     authMiddleware,
@@ -37,6 +41,7 @@ router.patch(
 );
 
 
+// Delete alert
 router.delete(
     "/:id",
     authMiddleware,

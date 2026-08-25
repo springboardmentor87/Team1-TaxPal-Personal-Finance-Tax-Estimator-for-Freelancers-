@@ -1,9 +1,12 @@
-const TaxEventService = require("../services/taxEventService");
-const asyncHandler = require("../utils/asyncHandler");
+const TaxEventService =
+    require("../services/taxEventService");
+
+const asyncHandler =
+    require("../utils/asyncHandler");
 
 
-const createTaxEvent = asyncHandler(
-    async (req, res) => {
+const createTaxEvent =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
 
@@ -15,16 +18,15 @@ const createTaxEvent = asyncHandler(
 
         return res.status(201).json({
             success: true,
-            message: "Tax event created successfully",
+            message:
+                "Tax event created successfully",
             data: event
         });
-
-    }
-);
+    });
 
 
-const createQuarterlyTaxEvents = asyncHandler(
-    async (req, res) => {
+const createQuarterlyTaxEvents =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
 
@@ -44,58 +46,67 @@ const createQuarterlyTaxEvents = asyncHandler(
                 "Quarterly tax events created successfully",
             data: events
         });
-
-    }
-);
+    });
 
 
-const getTaxEvents = asyncHandler(
-    async (req, res) => {
+const getTaxEvents =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
 
+        const year =
+            req.query.year
+                ? Number(req.query.year)
+                : null;
+
         const events =
             await TaxEventService.getTaxEvents(
-                user_id
+                user_id,
+                year
             );
 
         return res.status(200).json({
             success: true,
-            message: "Tax events fetched successfully",
+            message:
+                "Tax events fetched successfully",
             data: events
         });
-
-    }
-);
+    });
 
 
-const getTaxEventsByMonth = asyncHandler(
-    async (req, res) => {
+const getTaxEventsByMonth =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
-        const { month } = req.query;
+
+        const month =
+            Number(req.query.month);
+
+        const year =
+            Number(req.query.year) ||
+            new Date().getFullYear();
 
         const events =
             await TaxEventService.getTaxEventsByMonth(
                 user_id,
-                month
+                month,
+                year
             );
 
         return res.status(200).json({
             success: true,
-            message: "Tax events fetched successfully",
+            message:
+                "Tax events fetched successfully",
             data: events
         });
-
-    }
-);
+    });
 
 
-const updateTaxEvent = asyncHandler(
-    async (req, res) => {
+const updateTaxEvent =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
-        const { id } = req.params;
+        const id = req.params.id;
 
         await TaxEventService.updateTaxEvent(
             id,
@@ -105,18 +116,17 @@ const updateTaxEvent = asyncHandler(
 
         return res.status(200).json({
             success: true,
-            message: "Tax event updated successfully"
+            message:
+                "Tax event updated successfully"
         });
-
-    }
-);
+    });
 
 
-const markEventAsCompleted = asyncHandler(
-    async (req, res) => {
+const markEventAsCompleted =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
-        const { id } = req.params;
+        const id = req.params.id;
 
         await TaxEventService.markEventAsCompleted(
             id,
@@ -125,18 +135,17 @@ const markEventAsCompleted = asyncHandler(
 
         return res.status(200).json({
             success: true,
-            message: "Tax event marked as completed"
+            message:
+                "Tax event marked as completed"
         });
-
-    }
-);
+    });
 
 
-const deleteTaxEvent = asyncHandler(
-    async (req, res) => {
+const deleteTaxEvent =
+    asyncHandler(async (req, res) => {
 
         const user_id = req.user.id;
-        const { id } = req.params;
+        const id = req.params.id;
 
         await TaxEventService.deleteTaxEvent(
             id,
@@ -145,11 +154,10 @@ const deleteTaxEvent = asyncHandler(
 
         return res.status(200).json({
             success: true,
-            message: "Tax event deleted successfully"
+            message:
+                "Tax event deleted successfully"
         });
-
-    }
-);
+    });
 
 
 module.exports = {
