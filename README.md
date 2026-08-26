@@ -1,6 +1,6 @@
 # 💰 TaxPal – Personal Finance & Tax Estimator for Freelancers
 
-**TaxPal** is a full-stack personal finance and automated tax estimation platform engineered specifically for freelancers, gig economy workers, independent contractors, and self-employed professionals. It provides expense tracking, budget management, tax calculations with regional tax slabs and deductions, automated receipt scanning, periodic report exports, and an AI-powered financial assistant.
+**TaxPal** is a full-stack personal finance and automated tax estimation platform engineered specifically for freelancers, gig economy workers, independent contractors, and self-employed professionals. It provides expense tracking, budget management, tax calculations with regional tax slabs and deductions, automated receipt scanning, and periodic report exports.
 
 ---
 
@@ -11,7 +11,7 @@
 | **Milestone 1: Transaction Logging & Dashboard** | User Auth (JWT/Bcrypt), Manual Income & Expense Logging, Core Dashboard with KPI cards & Transaction Lists. | ✅ **Completed** |
 | **Milestone 2: Categorization & Budgeting** | Smart Category Suggestions, Monthly Spending Limits, Visual Budget Progress & Health Meters, Category Management. | ✅ **Completed** |
 | **Milestone 3: Tax Estimation & Planning** | Regional Tax Calculation (US, India, etc.), Deduction Analysis, Quarterly Tax Deadlines & Reminder Alerts. | ✅ **Completed** |
-| **Milestone 4: Reporting & AI Assistant** | Financial Statement Summaries (Income Statement, Expense Report, Tax Summaries), Scheduled Reports & Email Delivery, Receipt Scanner, AI Chatbot Assistant. | ✅ **Completed** |
+| **Milestone 4: Reporting & Export** | Financial Statement Summaries (Income Statement, Expense Report, Tax Summaries), Scheduled Reports & Email Delivery, Receipt Scanner, Financial Help Assistant. | ✅ **Completed** |
 
 ---
 
@@ -65,8 +65,8 @@
 - **Deduction Engine**: Automatic deduction calculations for Home Office, Equipment, Software Subscriptions, Health Insurance, and Retirement (PPF, NPS, SEP IRA, Solo 401k).
 - **Quarterly Calendar**: Due date tracking for Q1–Q4 with status indicators (*Upcoming*, *Due Soon*, *Paid*).
 
-### 🤖 5. AI Chatbot & Receipt Scanner
-- **AI Financial Assistant**: Integrated conversational assistant to answer tax questions, deduction eligibility, and budget health tips.
+### 🧾 5. Financial Chat Assistant & Receipt Scanner
+- **Financial Assistant**: Interactive assistant to answer tax questions, deduction eligibility, and budget health tips.
 - **Receipt Scanning**: Upload receipt images or PDFs with automatic metadata extraction.
 
 ### 📑 6. Reports & Automated Email Delivery
@@ -194,7 +194,7 @@ Team1-TaxPal-Personal-Finance-Tax-Estimator-for-Freelancers-/
 | **Tax Estimates** | `GET` | `/api/tax-estimates` | Fetch historical tax calculation records |
 | **Reports** | `GET` | `/api/reports/summary` | Generate financial report summaries |
 | **Alerts** | `GET` | `/api/alerts` | Fetch unread reminders & deadline alerts |
-| **Chat** | `POST` | `/api/chat` | Send message to AI financial assistant |
+| **Chat** | `POST` | `/api/chat` | Send message to financial assistant |
 | **Receipts** | `POST` | `/api/receipts/scan` | Upload and scan receipt |
 
 ---
