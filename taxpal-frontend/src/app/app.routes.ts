@@ -1,24 +1,26 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './auth/login';
-import { SignupComponent } from './auth/signup';
-import { DashboardComponent } from './dashboard/dashboard';
-import { TransactionListComponent } from './transactions/transaction-list';
-import { BudgetListComponent } from './budgets/budget-list';
-import { CategoryListComponent } from './categories/category-list';
-import { TaxEstimatorComponent } from './tax-estimator/tax-estimator';
-import { ComingSoonComponent } from './shared/coming-soon';
-import { authGuard } from './auth/auth.guard';
+import { Login } from './pages/login/login';
+import { Signup } from './pages/signup/signup';
+import { Dashboard } from './pages/dashboard/dashboard';
+import { Income } from './pages/income/income';
+import { Expense } from './pages/expense/expense';
+import { Budgets } from './pages/budgets/budgets';
+import { Profile } from './pages/profile/profile';
+import { Transactions } from './pages/transactions/transactions';
+import { TaxEstimator } from './pages/tax-estimator/tax-estimator';
+import { Reports } from './pages/reports/reports';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'transactions', component: TransactionListComponent, canActivate: [authGuard] },
-  { path: 'budgets', component: BudgetListComponent, canActivate: [authGuard] },
-  { path: 'categories', component: CategoryListComponent, canActivate: [authGuard] },
-  { path: 'tax-estimator', component: TaxEstimatorComponent, canActivate: [authGuard] },
-  { path: 'coming-soon', component: ComingSoonComponent, canActivate: [authGuard] },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard' }
+  { path: '', component: Login },
+  { path: 'login', component: Login },
+  { path: 'signup', component: Signup },
+  { path: 'dashboard', component: Dashboard },
+  { path: 'income', component: Income },
+  { path: 'expense', component: Expense },
+  { path: 'budgets', component: Budgets },
+  { path: 'profile', component: Profile },
+  { path: 'transactions', component: Transactions },
+  { path: 'tax-estimator', component: TaxEstimator },
+  { path: 'reports', component: Reports },
+  { path: '**', redirectTo: '' }
 ];
-

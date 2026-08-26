@@ -1,0 +1,122 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="brand-header">
+      <div class="brand-title">TaxPal</div>
+      <p class="brand-subtitle">Sign in to your account to continue</p>
+    </div>
+
+    @if (errorMessage) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="alert-icon">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <form (submit)="login(); $event.preventDefault()" class="login-form">
+      <!-- Username / Email Field -->
+      <div class="form-group" [class.has-error]="emailError">
+        <label for="email">Username</label>
+        <input id="email" type="text" placeholder="Enter your username" [(ngModel)]="email" name="email"
+          (input)="onEmailInput()" (blur)="validateEmail()" autocomplete="username">
+        @if (emailError) {
+        <span class="error-text">{{ emailError }}</span>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group" [class.has-error]="passwordError">
+        <div class="label-row">
+          <label for="password">Password</label>
+          <a (click)="openForgotModal()" class="forgot-link">Forgot password?</a>
+        </div>
+        <input id="password" type="password" placeholder="Enter your password" [(ngModel)]="password" name="password"
+          (input)="onPasswordInput()" (blur)="validatePassword()" autocomplete="current-password">
+        @if (passwordError) {
+        <span class="error-text">{{ passwordError }}</span>
+        }
+      </div>
+
+      <!-- Sign In Button -->
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading">
+        @if (isLoading) {
+        <span class="spinner"></span>
+        <span>Signing In...</span>
+        } @else {
+        <span>Sign In</span>
+        }
+      </button>
+
+
+      <!-- Sign Up Link -->
+      <div class="signup-row">
+        <span>Don't have an account? </span>
+        <a routerLink="/signup" class="link-primary">Sign up</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer Copyright -->
+  <div class="login-footer">
+    <p>© 2025 TaxPal. All rights reserved.</p>
+  </div>
+
+  <!-- Forgot Password Modal Overlay -->
+  <div class="modal-backdrop" *ngIf="showForgotModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3>Reset Password</h3>
+          <p>{{ otpSent ? 'Enter the OTP and your new password' : 'Enter your registered email for an OTP' }}</p>
+        </div>
+        <button type="button" (click)="closeForgotModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="modalError" class="alert alert-error" style="margin-bottom: 16px;">
+          <span>{{ modalError }}</span>
+        </div>
+        <div *ngIf="modalSuccess" class="alert alert-success" style="margin-bottom: 16px;">
+          <span>{{ modalSuccess }}</span>
+        </div>
+
+        <form *ngIf="!otpSent" (submit)="sendResetOtp(); $event.preventDefault()">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" [(ngModel)]="resetEmail" name="resetEmail" required placeholder="Enter your email" />
+          </div>
+          <div class="modal-footer" style="margin: 20px -24px -24px -24px;">
+            <button type="button" class="btn btn-secondary" (click)="closeForgotModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+              <span *ngIf="modalLoading" class="spinner"></span>
+              <span>Send OTP</span>
+            </button>
+          </div>
+        </form>
+
+        <form *ngIf="otpSent" (submit)="resetPassword(); $event.preventDefault()">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>6-Digit OTP</label>
+            <input type="text" [(ngModel)]="otpCode" name="otpCode" required maxlength="6" placeholder="123456" 
+              style="letter-spacing: 4px; text-align: center; font-weight: 700;" />
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" [(ngModel)]="newPassword" name="newPassword" required placeholder="Enter new password" />
+          </div>
+          <div class="modal-footer" style="margin: 20px -24px -24px -24px;">
+            <button type="button" class="btn btn-secondary" (click)="closeForgotModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+              <span *ngIf="modalLoading" class="spinner"></span>
+              <span>Reset Password</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
