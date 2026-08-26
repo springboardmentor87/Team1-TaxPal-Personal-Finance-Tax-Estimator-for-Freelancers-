@@ -1,0 +1,341 @@
+<div class="tax-estimator-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      </div>
+      <h2>TaxPal</h2>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li>
+        <a routerLink="/dashboard">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9"></rect>
+              <rect x="14" y="3" width="7" height="5"></rect>
+              <rect x="14" y="12" width="7" height="9"></rect>
+              <rect x="3" y="16" width="7" height="5"></rect>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/transactions">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </span>
+          <span>Transactions</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/budgets">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <line x1="12" y1="7" x2="12" y2="17"></line>
+              <path d="M15 9.5a2.5 2.5 0 0 0-5 0c0 2.5 5 2.5 5 5a2.5 2.5 0 0 1-5 0"></path>
+            </svg>
+          </span>
+          <span>Budgets</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/profile">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </span>
+          <span>Categories</span>
+        </a>
+      </li>
+      <li class="active">
+        <a routerLink="/tax-estimator">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="18" y="3" width="4" height="18" rx="2" ry="2"></rect>
+              <rect x="10" y="8" width="4" height="13" rx="2" ry="2"></rect>
+              <rect x="2" y="13" width="4" height="8" rx="2" ry="2"></rect>
+            </svg>
+          </span>
+          <span>Tax Estimator</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/reports">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </span>
+          <span>Reports</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Bottom User Profile Card -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-info">
+          <div class="sidebar-avatar">{{ userInitials }}</div>
+          <div class="sidebar-user-text">
+            <span class="sidebar-user-name">{{ userName }}</span>
+            <span class="sidebar-user-email">{{ userEmail }}</span>
+          </div>
+        </div>
+        <div class="sidebar-user-actions">
+          <button routerLink="/profile" class="sidebar-action-btn" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button (click)="logout()" class="sidebar-action-btn" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content-wrapper">
+    <!-- Header Title -->
+    <div class="page-title-row">
+      <h1>Tax Estimator</h1>
+      <p>Calculate your estimated tax obligations</p>
+    </div>
+
+    <!-- 2-Column Calculator & Summary (Mockup Page 9) -->
+    <div class="calculator-grid">
+      <!-- Left Column: Quarterly Tax Calculator Form -->
+      <div class="card calculator-card">
+        <div class="card-head">
+          <h3>Quarterly Tax Calculator</h3>
+        </div>
+
+        <form (submit)="calculateEstimatedTax(); $event.preventDefault()" class="tax-form">
+          <!-- Dropdowns Row 1: Country & State -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="country">Country/Region</label>
+              <select id="country" [(ngModel)]="selectedCountry" name="country" (change)="onCountryChange()">
+                <option *ngFor="let c of countriesList" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+
+            <div class="form-group" *ngIf="hasStateSelect(selectedCountry)">
+              <label for="state">{{ getStateLabel(selectedCountry) }}</label>
+              <select id="state" [(ngModel)]="selectedState" name="state">
+                <option *ngFor="let s of getStateOptions(selectedCountry)" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dropdowns Row 2: Filing Status & Quarter -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="filingStatus">Filing Status</label>
+              <select id="filingStatus" [(ngModel)]="selectedFilingStatus" name="filingStatus">
+                <option *ngFor="let s of getFilingStatusesForSelectedCountry()" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="quarter">Quarter</label>
+              <select id="quarter" [(ngModel)]="selectedQuarterKey" name="quarter">
+                <option *ngFor="let q of quarterOptions" [value]="q.key">{{ q.label }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Income Section -->
+          <div class="form-section-title">Income</div>
+          <div class="form-group">
+            <label for="grossIncome">Gross Income for Quarter</label>
+            <input id="grossIncome" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="grossIncome" name="grossIncome">
+          </div>
+
+          <!-- Deductions Section -->
+          <div class="form-section-title">Deductions</div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="businessExpenses">Business Expenses</label>
+              <input id="businessExpenses" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="businessExpenses" name="businessExpenses">
+            </div>
+
+            <div class="form-group">
+              <label for="retirement">Retirement Contributions</label>
+              <input id="retirement" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="retirementContribution" name="retirement">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="healthInsurance">Health Insurance Premiums</label>
+              <input id="healthInsurance" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="healthInsurance" name="healthInsurance">
+            </div>
+
+            <div class="form-group">
+              <label for="homeOffice">Home Office Deduction</label>
+              <input id="homeOffice" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="homeOfficeDeduction" name="homeOffice">
+            </div>
+          </div>
+
+          <!-- Calculate Button -->
+          <div class="form-actions-right">
+            <button type="submit" class="btn btn-primary" [disabled]="isCalculating">
+              <span *ngIf="isCalculating" class="spinner"></span>
+              <span>Calculate Estimated Tax</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Tax Summary Card (Mockup Page 9) -->
+      <div class="card summary-card">
+        <div class="card-head">
+          <h3>Tax Summary</h3>
+        </div>
+
+        @if (!calculationResult) {
+        <div class="summary-empty-box">
+          <svg class="summary-doc-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <p>Enter your income and deduction details to calculate your estimated quarterly tax.</p>
+        </div>
+        } @else {
+        <div class="summary-details">
+          <div class="summary-item">
+            <span class="s-label">Gross Income</span>
+            <span class="s-value">{{ formatCurrency(calculationResult.grossIncome || grossIncome) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-label">Total Deductions</span>
+            <span class="s-value text-success">-{{ formatCurrency(calculationResult.totalDeductions || (businessExpenses + retirementContribution + healthInsurance + homeOfficeDeduction)) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-label">Taxable Net Profit</span>
+            <span class="s-value font-semibold">{{ formatCurrency(calculationResult.taxableIncome) }}</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-item" *ngIf="calculationResult.federalTax !== undefined">
+            <span class="s-label">{{ selectedCountry === 'India' ? 'Union Income Tax' : (selectedCountry === 'United Kingdom' || selectedCountry === 'Australia' || selectedCountry === 'Japan' ? 'National Income Tax' : 'Federal Income Tax') }}</span>
+            <span class="s-value">{{ formatCurrency(calculationResult.federalTax) }}</span>
+          </div>
+          <div class="summary-item" *ngIf="calculationResult.stateTax !== undefined && calculationResult.stateTax > 0">
+            <span class="s-label">{{ selectedCountry === 'India' ? 'State Professional Tax' : (selectedCountry === 'Canada' ? 'Provincial Tax' : (selectedCountry === 'Switzerland' ? 'Cantonal Tax' : (selectedCountry === 'Japan' ? 'Local Inhabitant Tax' : 'State Income Tax'))) }}</span>
+            <span class="s-value">{{ formatCurrency(calculationResult.stateTax) }}</span>
+          </div>
+          <div class="summary-item" *ngIf="calculationResult.selfEmploymentTax !== undefined && calculationResult.selfEmploymentTax > 0">
+            <span class="s-label">{{ selectedCountry === 'United Kingdom' ? 'National Insurance (Class 4)' : (selectedCountry === 'Australia' ? 'Medicare Levy (2%)' : (selectedCountry === 'Germany' ? 'Solidarity Surcharge' : 'Self-Employment Tax')) }}</span>
+            <span class="s-value">{{ formatCurrency(calculationResult.selfEmploymentTax) }}</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-total-row">
+            <span class="total-label">Total Estimated Tax</span>
+            <span class="total-value">{{ formatCurrency(calculationResult.estimatedTax) }}</span>
+          </div>
+          <div class="due-date-note" *ngIf="calculationResult.dueDate">
+            <span>Due Date: <strong>{{ formatDate(calculationResult.dueDate) }}</strong></span>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bottom Section: Tax Calendar (Real Database Estimates) -->
+    <div class="calendar-section">
+      <h3 class="section-title">Tax Calendar</h3>
+
+      <!-- Dynamic Calendar Groups by Month -->
+      <div class="month-calendar-group" *ngFor="let group of calendarGroups">
+        <h4 class="month-title">{{ group.monthYear }}</h4>
+        <div class="calendar-events-list">
+          <div class="card event-card" [class.is-paid]="event.status === 'Paid'" *ngFor="let event of group.items">
+            <div class="event-left">
+              <h5>
+                <span>{{ event.title }}</span>
+                <span *ngIf="event.status === 'Paid'" class="badge badge-paid">✓ Paid</span>
+              </h5>
+              <span class="event-date">{{ event.dateStr }}</span>
+              <p class="event-desc">{{ event.message }}</p>
+            </div>
+            <div class="event-right">
+              <span *ngIf="event.status !== 'Paid'" class="badge" [ngClass]="event.badge === 'reminder' ? 'badge-reminder' : 'badge-payment'">{{ event.badge }}</span>
+              <div class="event-actions">
+                <button (click)="togglePaidStatus(event)" class="btn-cal-action" [ngClass]="event.status === 'Paid' ? 'btn-paid-active' : 'btn-mark-paid'" [title]="event.status === 'Paid' ? 'Click to mark as pending' : 'Click to mark as paid'">
+                  <span>{{ event.status === 'Paid' ? '✓ Paid' : 'Mark as Paid' }}</span>
+                </button>
+                <button (click)="deleteCalendarEvent(event)" class="btn-cal-action btn-delete-cal" title="Delete event">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clean Empty State when user has no estimates yet -->
+      <div class="card empty-calendar-box" *ngIf="calendarGroups.length === 0">
+        <div class="empty-cal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <p class="empty-title">No Tax Deadlines Scheduled</p>
+        <p class="empty-subtitle">Fill in your estimated income and deduction details above and click <strong>Calculate Estimated Tax</strong> to schedule your quarterly tax deadlines and reminders.</p>
+      </div>
+    </div>
+
+    <!-- Tax Savings Opportunities Card -->
+    <div class="card savings-opportunity-card">
+      <div class="opportunity-header">
+        <svg class="bulb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="9" y1="18" x2="15" y2="18"></line>
+          <line x1="10" y1="22" x2="14" y2="22"></line>
+          <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+        </svg>
+        <h4>Tax Savings Opportunities</h4>
+      </div>
+      <div class="opportunity-body">
+        <h5>Maximize Retirement & Expense Deductions</h5>
+        <p>Contributing to retirement plans (SEP IRA, Solo 401(k), traditional IRA) and claiming eligible home office or business equipment expenses directly reduces your taxable self-employment income.</p>
+      </div>
+    </div>
+  </main>
+</div>

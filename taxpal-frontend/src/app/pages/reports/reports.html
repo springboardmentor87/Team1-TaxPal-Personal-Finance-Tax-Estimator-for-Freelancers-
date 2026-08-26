@@ -1,0 +1,309 @@
+<div class="reports-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      </div>
+      <h2>TaxPal</h2>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li>
+        <a routerLink="/dashboard">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9"></rect>
+              <rect x="14" y="3" width="7" height="5"></rect>
+              <rect x="14" y="12" width="7" height="9"></rect>
+              <rect x="3" y="16" width="7" height="5"></rect>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/transactions">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </span>
+          <span>Transactions</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/budgets">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <line x1="12" y1="7" x2="12" y2="17"></line>
+              <path d="M15 9.5a2.5 2.5 0 0 0-5 0c0 2.5 5 2.5 5 5a2.5 2.5 0 0 1-5 0"></path>
+            </svg>
+          </span>
+          <span>Budgets</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/profile">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </span>
+          <span>Categories</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/tax-estimator">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="18" y="3" width="4" height="18" rx="2" ry="2"></rect>
+              <rect x="10" y="8" width="4" height="13" rx="2" ry="2"></rect>
+              <rect x="2" y="13" width="4" height="8" rx="2" ry="2"></rect>
+            </svg>
+          </span>
+          <span>Tax Estimator</span>
+        </a>
+      </li>
+      <li class="active">
+        <a routerLink="/reports">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </span>
+          <span>Reports</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Bottom User Profile Card -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-info">
+          <div class="sidebar-avatar">{{ userInitials }}</div>
+          <div class="sidebar-user-text">
+            <span class="sidebar-user-name">{{ userName }}</span>
+            <span class="sidebar-user-email">{{ userEmail }}</span>
+          </div>
+        </div>
+        <div class="sidebar-user-actions">
+          <button routerLink="/profile" class="sidebar-action-btn" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button (click)="logout()" class="sidebar-action-btn" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content-wrapper">
+    <div class="page-title-row">
+      <h1>Financial Reports</h1>
+      <p>Generate and download your financial reports</p>
+    </div>
+
+    @if (errorMessage) {
+    <div class="alert alert-error">
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    @if (successMessage) {
+    <div class="alert alert-success">
+      <span>{{ successMessage }}</span>
+    </div>
+    }
+
+    <!-- Generate Report Card (Mockup Pages 10 & 15) -->
+    <div class="card generate-report-card">
+      <div class="card-head">
+        <h3>Generate Report</h3>
+      </div>
+
+      <form (submit)="generateReport(); $event.preventDefault()" class="report-generate-form">
+        <div class="form-row-3">
+          <div class="form-group">
+            <label for="reportType">Report Type</label>
+            <select id="reportType" [(ngModel)]="selectedReportType" name="reportType">
+              <option *ngFor="let rt of reportTypes" [value]="rt">{{ rt }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="period">Period</label>
+            <select id="period" [(ngModel)]="selectedPeriod" name="period">
+              <option *ngFor="let p of periods" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="format">Format</label>
+            <select id="format" [(ngModel)]="selectedFormat" name="format">
+              <option value="PDF">PDF</option>
+              <option value="CSV">CSV</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions-right">
+          <button type="button" class="btn btn-secondary" (click)="resetFilters()">Reset</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isGenerating">
+            <span *ngIf="isGenerating" class="spinner"></span>
+            <span>Generate Report</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Recent Reports Card (Mockup Pages 10 & 15) -->
+    <div class="card recent-reports-card">
+      <div class="card-head">
+        <h3>Recent Reports</h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="reports-table">
+          <thead>
+            <tr>
+              <th>Report Name</th>
+              <th>Generated</th>
+              <th>Period</th>
+              <th>Format</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of reports">
+              <td class="font-semibold">{{ r.reportType }}</td>
+              <td>{{ r.createdAt | date:'mediumDate' }}</td>
+              <td>{{ r.period }}</td>
+              <td>
+                <span class="badge" [class.badge-reminder]="r.format === 'PDF'" [class.badge-good]="r.format === 'CSV'">
+                  {{ r.format }}
+                </span>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <button (click)="previewReport(r)" class="btn-icon" title="Preview Report">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                  <button (click)="downloadReport(r)" class="btn-icon text-primary" title="Download Report">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </button>
+                  <button (click)="deleteReport(r._id)" class="btn-icon text-danger" title="Delete Report">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="reports.length === 0">
+              <td colspan="5" class="text-center py-6 text-muted">No results.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Report Preview Card (Mockup Pages 10 & 15) -->
+    <div class="card report-preview-card">
+      <div class="preview-header-bar">
+        <h3>Report Preview</h3>
+        <div class="preview-actions" *ngIf="selectedReport">
+          <button (click)="printReport()" class="btn btn-secondary btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print</span>
+          </button>
+          <button (click)="downloadReport(selectedReport)" class="btn btn-primary btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-content-box">
+        @if (!selectedReport) {
+        <div class="preview-empty-state">
+          <svg class="preview-doc-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <h4>Select a report to preview</h4>
+          <p>Generated reports will appear here for review before downloading</p>
+        </div>
+        } @else {
+        <div class="preview-document">
+          <div class="doc-header">
+            <div>
+              <h2>{{ selectedReport.reportType }}</h2>
+              <p class="doc-period">Period: {{ selectedReport.period }}</p>
+            </div>
+            <div class="doc-badge">
+              <span>Format: {{ selectedReport.format }}</span>
+            </div>
+          </div>
+          <div class="doc-summary-grid">
+            <div class="doc-stat">
+              <span>Total Income</span>
+              <strong>{{ formatCurrency(selectedReport.totalIncome) }}</strong>
+            </div>
+            <div class="doc-stat">
+              <span>Total Expenses</span>
+              <strong>{{ formatCurrency(selectedReport.totalExpenses) }}</strong>
+            </div>
+            <div class="doc-stat">
+              <span>Net Savings</span>
+              <strong class="text-success">{{ formatCurrency(selectedReport.netSavings) }}</strong>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,93 @@
+<div class="transaction-container">
+  <div class="transaction-card">
+    <div class="card-header-bar">
+      <div>
+        <h2 class="card-main-title">Record New Expense</h2>
+        <p class="card-main-subtitle">Add details about your expense to track your spending better.</p>
+      </div>
+      <button routerLink="/dashboard" class="close-x-btn" title="Back to Dashboard">&times;</button>
+    </div>
+
+    <div class="inner-form-box">
+      <div class="inner-header">
+        <span class="inner-title">Add Expense</span>
+        <span class="expense-icon-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </span>
+      </div>
+
+      @if (errorMessage) {
+      <div class="alert alert-error">
+        <span>{{ errorMessage }}</span>
+      </div>
+      }
+
+      <form (submit)="saveExpense(); $event.preventDefault()" class="transaction-form">
+        <!-- Row 1: Description & Amount -->
+        <div class="form-row-2">
+          <div class="form-group" [class.has-error]="descriptionError">
+            <label for="description">Description</label>
+            <input id="description" type="text" placeholder="e.g. Web Design Project" [(ngModel)]="description"
+              name="description" (input)="onDescriptionInput()">
+            @if (descriptionError) {
+            <span class="error-text">{{ descriptionError }}</span>
+            }
+          </div>
+
+          <div class="form-group" [class.has-error]="amountError">
+            <label for="amount">Amount</label>
+            <input id="amount" type="number" step="0.01" placeholder="$ 0.00" [(ngModel)]="amount" name="amount">
+            @if (amountError) {
+            <span class="error-text">{{ amountError }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Row 2: Category & Date -->
+        <div class="form-row-2">
+          <div class="form-group" [class.has-error]="categoryError">
+            <div class="label-row">
+              <label for="category">Category</label>
+              @if (isAutoSuggested) {
+              <span class="auto-suggest-badge">Auto-suggested</span>
+              }
+            </div>
+            <select id="category" [(ngModel)]="category" name="category" (change)="onCategoryChange()">
+              <option value="" disabled selected>Select a category</option>
+              <option *ngFor="let opt of categoriesList" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+            @if (categoryError) {
+            <span class="error-text">{{ categoryError }}</span>
+            }
+          </div>
+
+          <div class="form-group" [class.has-error]="dateError">
+            <label for="transactionDate">Date</label>
+            <input id="transactionDate" type="date" [(ngModel)]="transactionDate" name="transactionDate">
+            @if (dateError) {
+            <span class="error-text">{{ dateError }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Row 3: Notes -->
+        <div class="form-group">
+          <label for="notes">Notes (Optional)</label>
+          <textarea id="notes" rows="3" placeholder="Add any additional details..." [(ngModel)]="notes" name="notes"></textarea>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="form-actions">
+          <button type="button" routerLink="/dashboard" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-danger" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner"></span>
+            <span>Save</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

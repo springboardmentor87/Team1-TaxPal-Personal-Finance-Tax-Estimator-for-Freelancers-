@@ -1,0 +1,106 @@
+<div class="signup-page">
+  <div class="signup-card">
+    <div class="brand-header">
+      <div class="brand-title">Create an Account</div>
+      <p class="brand-subtitle">Enter your information to create your TaxPal account</p>
+    </div>
+
+    @if (errorMessage) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="alert-icon">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <form (submit)="createAccount(); $event.preventDefault()" class="signup-form">
+      <!-- Username Field -->
+      <div class="form-group" [class.has-error]="usernameError">
+        <label for="username">Username</label>
+        <input id="username" type="text" placeholder="Choose a username" [(ngModel)]="username" name="username"
+          (input)="onUsernameInput()" (blur)="validateUsername()" autocomplete="username">
+        @if (usernameError) {
+        <span class="error-text">{{ usernameError }}</span>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group" [class.has-error]="passwordError">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Choose a password" [(ngModel)]="password" name="password"
+          (input)="onPasswordInput()" (blur)="validatePassword()" autocomplete="new-password">
+        @if (passwordError) {
+        <span class="error-text">{{ passwordError }}</span>
+        }
+      </div>
+
+      <!-- Full Name Field -->
+      <div class="form-group" [class.has-error]="fullNameError">
+        <label for="fullName">Full Name</label>
+        <input id="fullName" type="text" placeholder="Enter your full name" [(ngModel)]="fullName" name="fullName"
+          (input)="onFullNameInput()" (blur)="validateFullName()" autocomplete="name">
+        @if (fullNameError) {
+        <span class="error-text">{{ fullNameError }}</span>
+        }
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group" [class.has-error]="emailError">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="Enter your email address" [(ngModel)]="email" name="email"
+          (input)="onEmailInput()" (blur)="validateEmail()" autocomplete="email">
+        @if (emailError) {
+        <span class="error-text">{{ emailError }}</span>
+        }
+      </div>
+
+      <!-- Country Dropdown -->
+      <div class="form-group" [class.has-error]="countryError">
+        <label for="country">Country</label>
+        <select id="country" [(ngModel)]="country" name="country" (change)="validateCountry()">
+          <option value="" disabled selected>Select your country</option>
+          <option *ngFor="let c of countriesList" [value]="c">{{ c }}</option>
+        </select>
+        @if (countryError) {
+        <span class="error-text">{{ countryError }}</span>
+        }
+      </div>
+
+      <!-- Income Bracket (Optional) -->
+      <div class="form-group">
+        <label for="incomeBracket">Income Bracket (Optional)</label>
+        <select id="incomeBracket" [(ngModel)]="incomeBracket" name="incomeBracket">
+          <option value="" selected>Select your income bracket</option>
+          <option value="low">Low (Under $40,000)</option>
+          <option value="middle">Middle ($40,000 - $100,000)</option>
+          <option value="high">High ($100,000+)</option>
+        </select>
+      </div>
+
+      <!-- Create Account Button -->
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading">
+        @if (isLoading) {
+        <span class="spinner"></span>
+        <span>Creating Account...</span>
+        } @else {
+        <span>Create Account</span>
+        }
+      </button>
+
+      <!-- Sign In Link -->
+      <div class="signin-row">
+        <span>Already have an account? </span>
+        <a routerLink="/login" class="link-primary">Sign in</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Terms & Privacy Footer -->
+  <div class="signup-footer">
+    <p>By creating an account, you agree to our Terms of Service and Privacy Policy.</p>
+  </div>
+</div>

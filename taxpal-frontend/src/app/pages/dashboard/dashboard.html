@@ -1,0 +1,309 @@
+<div class="dashboard-container">
+
+  <!-- Sidebar (Matching Color Pattern with Dark Navy) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      </div>
+      <h2>TaxPal</h2>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li class="active">
+        <a routerLink="/dashboard">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9"></rect>
+              <rect x="14" y="3" width="7" height="5"></rect>
+              <rect x="14" y="12" width="7" height="9"></rect>
+              <rect x="3" y="16" width="7" height="5"></rect>
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/transactions">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </span>
+          <span>Transactions</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/budgets">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <line x1="12" y1="7" x2="12" y2="17"></line>
+              <path d="M15 9.5a2.5 2.5 0 0 0-5 0c0 2.5 5 2.5 5 5a2.5 2.5 0 0 1-5 0"></path>
+            </svg>
+          </span>
+          <span>Budgets</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/profile">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </span>
+          <span>Categories</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/tax-estimator">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="18" y="3" width="4" height="18" rx="2" ry="2"></rect>
+              <rect x="10" y="8" width="4" height="13" rx="2" ry="2"></rect>
+              <rect x="2" y="13" width="4" height="8" rx="2" ry="2"></rect>
+            </svg>
+          </span>
+          <span>Tax Estimator</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/reports">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </span>
+          <span>Reports</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Bottom User Profile Card -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-info">
+          <div class="sidebar-avatar">{{ userInitials }}</div>
+          <div class="sidebar-user-text">
+            <span class="sidebar-user-name">{{ userName }}</span>
+            <span class="sidebar-user-email">{{ userEmail }}</span>
+          </div>
+        </div>
+        <div class="sidebar-user-actions">
+          <button (click)="logout()" class="sidebar-action-btn" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="content-wrapper">
+    <!-- Top Greeting & Action Buttons -->
+    <div class="top-header-row">
+      <div class="greeting-box">
+        <h1>Financial Dashboard</h1>
+        <p>Welcome back, {{ userName }}! Here's your financial summary.</p>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/income" class="btn btn-action btn-record-income">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Record Income</span>
+        </a>
+        <a routerLink="/expense" class="btn btn-action btn-record-expense">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Record Expense</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 4 Metric Cards with Color Accents & Badges -->
+    <div class="metrics-grid">
+      <!-- Card 1: Monthly Income (Green Accent) -->
+      <div class="metric-card card-income">
+        <div class="metric-header">
+          <span class="metric-label">Monthly Income</span>
+          <div class="metric-icon-badge badge-income-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="metric-amount">{{ formatCurrency(totalIncome) }}</div>
+        <div class="metric-badge-row">
+          <span class="metric-subtext text-up">
+            <span class="trend-arrow">↑</span> {{ incomeTrendPct }} <span class="trend-desc">{{ incomeTrendText }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 2: Monthly Expenses (Red Accent) -->
+      <div class="metric-card card-expense">
+        <div class="metric-header">
+          <span class="metric-label">Monthly Expenses</span>
+          <div class="metric-icon-badge badge-expense-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="7" x2="17" y2="17"></line>
+              <polyline points="17 7 17 17 7 17"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="metric-amount">{{ formatCurrency(totalExpense) }}</div>
+        <div class="metric-badge-row">
+          <span class="metric-subtext text-down">
+            <span class="trend-arrow">↓</span> {{ expenseTrendPct }} <span class="trend-desc">{{ expenseTrendText }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 3: Estimated Tax Due (Amber Accent) -->
+      <div class="metric-card card-tax">
+        <div class="metric-header">
+          <span class="metric-label">Estimated Tax Due</span>
+          <div class="metric-icon-badge badge-tax-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="metric-amount">{{ formatCurrency(estimatedTaxDue) }}</div>
+        <div class="metric-badge-row">
+          <span class="metric-subtext text-muted-sub">{{ taxSubtext }}</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Savings Rate (Indigo Accent) -->
+      <div class="metric-card card-savings">
+        <div class="metric-header">
+          <span class="metric-label">Savings Rate</span>
+          <div class="metric-icon-badge badge-savings-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="metric-amount">{{ savingsRate }}</div>
+        <div class="metric-badge-row">
+          <span class="metric-subtext text-up">
+            <span class="trend-arrow">↑</span> {{ savingsTrendPct }} <span class="trend-desc">{{ savingsSubtext }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid (2 Columns) -->
+    <div class="charts-grid">
+      <!-- Left Chart: Income vs Expenses -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Income vs Expenses</h3>
+          <div class="interval-toggles">
+            <button class="toggle-btn" [class.active]="chartTimePeriod === 'month'" (click)="setChartTimePeriod('month')">Month</button>
+            <button class="toggle-btn" [class.active]="chartTimePeriod === 'quarter'" (click)="setChartTimePeriod('quarter')">Quarter</button>
+            <button class="toggle-btn" [class.active]="chartTimePeriod === 'year'" (click)="setChartTimePeriod('year')">Year</button>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="incomeExpenseChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Right Chart: Expense Breakdown -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Expense Breakdown</h3>
+        </div>
+        <div class="chart-breakdown-wrapper" *ngIf="expenseCategories.length > 0">
+          <div class="donut-chart-container">
+            <canvas id="spendingChart"></canvas>
+          </div>
+          <div class="category-legend-list">
+            <div class="legend-item" *ngFor="let cat of expenseCategories; let i = index">
+              <div class="legend-left">
+                <span class="legend-dot" [style.backgroundColor]="getCategoryColor(i)"></span>
+                <span class="legend-name">{{ cat.category }}</span>
+              </div>
+              <span class="legend-pct">{{ cat.percentage }}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="empty-expense-breakdown" *ngIf="expenseCategories.length === 0">
+          <p class="empty-text-clean">No expense records logged for this month.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions Table -->
+    <div class="transactions-section card">
+      <div class="section-header">
+        <h3 class="section-title">Recent Transactions</h3>
+        <a routerLink="/transactions" class="view-all-link">View All &rarr;</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of recentTransactions">
+              <td>{{ t.transactionDate | date:'mediumDate' }}</td>
+              <td class="font-semibold">{{ t.description }}</td>
+              <td>{{ t.category }}</td>
+              <td [class.income-val]="t.type === 'Income'" [class.expense-val]="t.type === 'Expense'">
+                {{ t.type === 'Income' ? '+' : '-' }}{{ formatCurrency(t.amount) }}
+              </td>
+              <td>
+                <span class="badge" [class.badge-income]="t.type === 'Income'" [class.badge-expense]="t.type === 'Expense'">
+                  {{ t.type.toLowerCase() }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="recentTransactions.length === 0">
+              <td colspan="5" class="empty-transactions-cell">
+                <div class="empty-clipboard-box">
+                  <svg class="clipboard-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    <line x1="9" y1="12" x2="15" y2="12"></line>
+                    <line x1="9" y1="16" x2="13" y2="16"></line>
+                  </svg>
+                  <p class="empty-msg">No transactions recorded yet.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>

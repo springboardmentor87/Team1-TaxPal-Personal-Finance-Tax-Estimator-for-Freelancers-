@@ -1,21 +1,8 @@
-// @vitest-environment jsdom
-import { TestBed, getTestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
-
-try {
-  getTestBed().initTestEnvironment(
-    BrowserTestingModule,
-    platformBrowserTesting()
-  );
-} catch (e) {
-  // Environment already initialized
-}
 
 describe('App', () => {
   beforeEach(async () => {
-    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
@@ -27,9 +14,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should have the title signal', () => {
+  it('should render title', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect((app as any).title()).toEqual('taxpal');
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend');
   });
 });
