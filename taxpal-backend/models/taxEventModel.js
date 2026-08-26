@@ -52,7 +52,6 @@ const TaxEventModel = {
                     status || "upcoming"
                 ],
                 (err, result) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -83,12 +82,9 @@ const TaxEventModel = {
                 params.push(year);
             }
 
-            query += `
-                ORDER BY due_date ASC
-            `;
+            query += ` ORDER BY due_date ASC`;
 
             db.query(query, params, (err, rows) => {
-
                 if (err) {
                     return reject(err);
                 }
@@ -106,8 +102,8 @@ const TaxEventModel = {
                 SELECT *
                 FROM tax_events
                 WHERE user_id = ?
-                AND substr(due_date, 6, 2) = ?
-                AND year = ?
+                AND MONTH(due_date) = ?
+                AND YEAR(due_date) = ?
                 ORDER BY due_date ASC
             `;
 
@@ -115,11 +111,10 @@ const TaxEventModel = {
                 query,
                 [
                     user_id,
-                    String(month).padStart(2, "0"),
+                    Number(month),
                     Number(year)
                 ],
                 (err, rows) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -146,7 +141,6 @@ const TaxEventModel = {
                 query,
                 [user_id, year],
                 (err, rows) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -177,8 +171,7 @@ const TaxEventModel = {
                     description = COALESCE(?, description),
                     due_date = COALESCE(?, due_date),
                     reminder_date = COALESCE(?, reminder_date),
-                    estimated_tax_amount =
-                        COALESCE(?, estimated_tax_amount),
+                    estimated_tax_amount = COALESCE(?, estimated_tax_amount),
                     status = COALESCE(?, status)
                 WHERE id = ?
                 AND user_id = ?
@@ -197,7 +190,6 @@ const TaxEventModel = {
                     user_id
                 ],
                 (err, result) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -225,7 +217,6 @@ const TaxEventModel = {
                 query,
                 [id, user_id],
                 (err, result) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -252,7 +243,6 @@ const TaxEventModel = {
                 query,
                 [id, user_id],
                 (err, result) => {
-
                     if (err) {
                         return reject(err);
                     }
@@ -264,6 +254,7 @@ const TaxEventModel = {
             );
         });
     }
+
 };
 
 module.exports = TaxEventModel;
