@@ -20,6 +20,7 @@ const categoryRoute = require("./routes/categoryRoute");
 const taxRoute = require("./routes/taxRoute");
 const alertRoute = require("./routes/alertRoute");
 const taxEventRoute = require("./routes/taxEventRoute");
+const reportRoutes = require("./routes/reportRoute");
 
 
 app.use(cors());
@@ -34,6 +35,7 @@ app.use("/api/categories", categoryRoute);
 app.use("/api/tax", taxRoute);
 app.use("/api/alerts", alertRoute);
 app.use("/api/tax-events", taxEventRoute);
+app.use("/api/reports", reportRoutes);
 
 
 app.get("/", (req, res) => {

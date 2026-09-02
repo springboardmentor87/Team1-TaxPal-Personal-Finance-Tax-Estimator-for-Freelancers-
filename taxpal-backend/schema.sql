@@ -64,3 +64,79 @@ CREATE TABLE IF NOT EXISTS categories (
         (user_id, name, type)
 );
 
+DROP TABLE IF EXISTS tax_calculations;
+
+CREATE TABLE tax_calculations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    year INT NOT NULL,
+    quarter VARCHAR(10),
+
+    country VARCHAR(100),
+    state VARCHAR(100),
+    filing_status VARCHAR(50),
+
+    gross_income DECIMAL(15,2) DEFAULT 0,
+    business_expenses DECIMAL(15,2) DEFAULT 0,
+    retirement_contributions DECIMAL(15,2) DEFAULT 0,
+    health_insurance_premiums DECIMAL(15,2) DEFAULT 0,
+    home_office_deduction DECIMAL(15,2) DEFAULT 0,
+
+    total_income DECIMAL(15,2) DEFAULT 0,
+    total_expenses DECIMAL(15,2) DEFAULT 0,
+    taxable_income DECIMAL(15,2) DEFAULT 0,
+    estimated_tax DECIMAL(15,2) DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE tax_estimates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    year INT NOT NULL,
+    quarter VARCHAR(10) NOT NULL,
+    estimated_tax DECIMAL(15,2) NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE alerts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    alert_type VARCHAR(50),
+    severity VARCHAR(30),
+    due_date DATE,
+    estimated_tax_amount DECIMAL(15,2) NULL,
+    is_read TINYINT(1) DEFAULT 0,
+    is_resolved TINYINT(1) DEFAULT 0,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NOT NULL,
+
+    period VARCHAR(50) NOT NULL,
+
+    report_type VARCHAR(30) NOT NULL,
+
+    file_path VARCHAR(500),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
