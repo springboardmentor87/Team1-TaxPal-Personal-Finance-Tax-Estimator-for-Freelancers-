@@ -1,3 +1,9 @@
 node_modules/
 .angular/
 dist/
+.env
+<<<<<<< HEAD
+=======
+*.sqlite
+
+>>>>>>> dd2ce35 (feat: complete Milestone 2 backend & frontend sync, SQLite fallback, categories schema, and CRUD operations)

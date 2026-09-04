@@ -1,79 +1,251 @@
 const db = require("../config/db");
 
 const BudgetModel = {
-    // Create a budget
-    create: (budgetData) => {
-        const { user_id, category, description, limit, month } = budgetData;
+
+
+    createBudget: (budgetData) => {
+
+        const {
+            user_id,
+            category,
+            budget_limit,
+            month,
+            description
+        } = budgetData;
+
         return new Promise((resolve, reject) => {
-            const sql = "INSERT INTO budgets (user_id, category, description, `limit`, month) VALUES (?, ?, ?, ?, ?)";
-            db.query(sql, [user_id, category, description, limit, month], (err, result) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve({
-                    id: result.insertId,
+
+            const sql = `
+                INSERT INTO budgets
+                (
                     user_id,
                     category,
-                    description,
-                    limit,
-                    month
-                });
-            });
+                    budget_limit,
+                    month,
+                    description
+                )
+                VALUES (?, ?, ?, ?, ?)
+            `;
+
+            db.query(
+                sql,
+                [
+                    user_id,
+                    category,
+                    budget_limit,
+                    month,
+                    description || null
+                ],
+                (err, result) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve({
+                        id: result.insertId,
+                        user_id,
+                        category,
+                        budget_limit,
+                        month,
+                        description: description || null
+                    });
+                }
+            );
         });
     },
 
-    // Get budgets for the logged-in user (with formatted date strings)
-    getAllByUserId: (userId) => {
+
+    getBudgetsByUser: (user_id) => {
+
         return new Promise((resolve, reject) => {
-            const sql = "SELECT id, user_id, category, description, `limit`, DATE_FORMAT(month, '%Y-%m-%d') AS month FROM budgets WHERE user_id = ?";
-            db.query(sql, [userId], (err, results) => {
-                if (err) {
-                    return reject(err);
+
+            const sql = `
+                SELECT *
+                FROM budgets
+                WHERE user_id = ?
+                ORDER BY month DESC, category ASC
+            `;
+
+            db.query(
+                sql,
+                [user_id],
+                (err, results) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(results);
                 }
-                resolve(results);
-            });
+            );
         });
     },
 
-    // Get a specific budget belonging to the logged-in user (with formatted date string)
-    getByIdAndUserId: (id, userId) => {
+
+
+    getBudgetsByUserAndMonth: (user_id, month) => {
+
         return new Promise((resolve, reject) => {
-            const sql = "SELECT id, user_id, category, description, `limit`, DATE_FORMAT(month, '%Y-%m-%d') AS month FROM budgets WHERE id = ? AND user_id = ?";
-            db.query(sql, [id, userId], (err, results) => {
-                if (err) {
-                    return reject(err);
+
+            const sql = `
+                SELECT *
+                FROM budgets
+                WHERE user_id = ?
+                AND month = ?
+                ORDER BY category ASC
+            `;
+
+            db.query(
+                sql,
+                [user_id, month],
+                (err, results) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(results);
                 }
-                resolve(results[0] || null);
-            });
+            );
         });
     },
 
-    // Update a budget
-    update: (id, userId, budgetData) => {
-        const { category, description, limit, month } = budgetData;
+
+    getBudgetById: (id, user_id) => {
+
         return new Promise((resolve, reject) => {
-            const sql = "UPDATE budgets SET category = ?, description = ?, `limit` = ?, month = ? WHERE id = ? AND user_id = ?";
-            db.query(sql, [category, description, limit, month, id, userId], (err, result) => {
-                if (err) {
-                    return reject(err);
+
+            const sql = `
+                SELECT *
+                FROM budgets
+                WHERE id = ?
+                AND user_id = ?
+            `;
+
+            db.query(
+                sql,
+                [id, user_id],
+                (err, results) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(results[0] || null);
                 }
-                resolve(result.affectedRows > 0);
-            });
+            );
         });
     },
 
-    // Delete a budget
-    delete: (id, userId) => {
+    updateBudget: (id, user_id, budgetData) => {
+
+        const {
+            category,
+            budget_limit,
+            month,
+            description
+        } = budgetData;
+
         return new Promise((resolve, reject) => {
-            const sql = "DELETE FROM budgets WHERE id = ? AND user_id = ?";
-            db.query(sql, [id, userId], (err, result) => {
-                if (err) {
-                    return reject(err);
+
+            const sql = `
+                UPDATE budgets
+                SET
+                    category = ?,
+                    budget_limit = ?,
+                    month = ?,
+                    description = ?
+                WHERE id = ?
+                AND user_id = ?
+            `;
+
+            db.query(
+                sql,
+                [
+                    category,
+                    budget_limit,
+                    month,
+                    description || null,
+                    id,
+                    user_id
+                ],
+                (err, result) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(result);
                 }
-                resolve(result.affectedRows > 0);
-            });
+            );
+        });
+    },
+
+    deleteBudget: (id, user_id) => {
+
+        return new Promise((resolve, reject) => {
+
+            const sql = `
+                DELETE FROM budgets
+                WHERE id = ?
+                AND user_id = ?
+            `;
+
+            db.query(
+                sql,
+                [id, user_id],
+                (err, result) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(result);
+                }
+            );
+        });
+    },
+
+    getSpendingByCategoryAndMonth: (
+        user_id,
+        startDate,
+        endDate
+    ) => {
+
+        return new Promise((resolve, reject) => {
+
+            const sql = `
+                SELECT
+                    category,
+                    SUM(amount) AS spent
+                FROM transactions
+                WHERE user_id = ?
+                AND type = 'Expense'
+                AND transaction_date >= ?
+                AND transaction_date < ?
+                GROUP BY category
+            `;
+
+            db.query(
+                sql,
+                [
+                    user_id,
+                    startDate,
+                    endDate
+                ],
+                (err, results) => {
+
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    resolve(results);
+                }
+            );
         });
     }
+
 };
 
 module.exports = BudgetModel;

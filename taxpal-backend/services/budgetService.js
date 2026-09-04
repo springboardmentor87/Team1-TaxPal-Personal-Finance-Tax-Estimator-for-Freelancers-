@@ -1,132 +1,332 @@
 const BudgetModel = require("../models/budgetModel");
 
-// Helper to validate YYYY-MM-DD date format and parse validity
-const isValidDate = (dateStr) => {
-    if (typeof dateStr !== "string") return false;
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(dateStr.trim())) return false;
-    const parsed = Date.parse(dateStr.trim());
-    return !isNaN(parsed);
+const BudgetService = {
+
+    // ==========================================
+    // Create Budget
+    // ==========================================
+    createBudget: async (user_id, budgetData) => {
+
+        const {
+            category,
+            budget_limit,
+            month,
+            description
+        } = budgetData;
+
+        if (!category || !budget_limit || !month) {
+            throw new Error(
+                "Category, budget limit and month are required"
+            );
+        }
+
+        if (Number(budget_limit) <= 0) {
+            throw new Error(
+                "Budget limit must be greater than 0"
+            );
+        }
+
+        const budget = await BudgetModel.createBudget({
+            user_id,
+            category,
+            budget_limit,
+            month,
+            description
+        });
+
+        return budget;
+    },
+
+
+    // ==========================================
+    // Get All Budgets
+    // ==========================================
+    getBudgets: async (user_id) => {
+
+        return await BudgetModel.getBudgetsByUser(
+            user_id
+        );
+    },
+
+
+    // ==========================================
+    // Get Budgets By Month
+    // ==========================================
+    getBudgetsByMonth: async (user_id, month) => {
+
+        if (!month) {
+            throw new Error("Month is required");
+        }
+
+        return await BudgetModel.getBudgetsByUserAndMonth(
+            user_id,
+            month
+        );
+    },
+
+
+    // ==========================================
+    // Get Single Budget
+    // ==========================================
+    getBudgetById: async (id, user_id) => {
+
+        const budget =
+            await BudgetModel.getBudgetById(
+                id,
+                user_id
+            );
+
+        if (!budget) {
+            throw new Error("Budget not found");
+        }
+
+        return budget;
+    },
+
+
+    // ==========================================
+    // Update Budget
+    // ==========================================
+    updateBudget: async (
+        id,
+        user_id,
+        budgetData
+    ) => {
+
+        const {
+            category,
+            budget_limit,
+            month,
+            description
+        } = budgetData;
+
+        if (!category || !budget_limit || !month) {
+            throw new Error(
+                "Category, budget limit and month are required"
+            );
+        }
+
+        if (Number(budget_limit) <= 0) {
+            throw new Error(
+                "Budget limit must be greater than 0"
+            );
+        }
+
+        const existingBudget =
+            await BudgetModel.getBudgetById(
+                id,
+                user_id
+            );
+
+        if (!existingBudget) {
+            throw new Error("Budget not found");
+        }
+
+        const result =
+            await BudgetModel.updateBudget(
+                id,
+                user_id,
+                {
+                    category,
+                    budget_limit,
+                    month,
+                    description
+                }
+            );
+
+        return result;
+    },
+
+
+    // ==========================================
+    // Delete Budget
+    // ==========================================
+    deleteBudget: async (
+        id,
+        user_id
+    ) => {
+
+        const existingBudget =
+            await BudgetModel.getBudgetById(
+                id,
+                user_id
+            );
+
+        if (!existingBudget) {
+            throw new Error("Budget not found");
+        }
+
+        const result =
+            await BudgetModel.deleteBudget(
+                id,
+                user_id
+            );
+
+        return result;
+    },
+
+
+    // ==========================================
+    // Get Budget Progress
+    // ==========================================
+    getBudgetProgress: async (
+        user_id,
+        month
+    ) => {
+
+        if (!month) {
+            throw new Error("Month is required");
+        }
+
+        // Expected:
+        // 2026-08-01
+
+        const startDate = month;
+
+        // Calculate next month
+        const date = new Date(`${month}T00:00:00`);
+
+        date.setMonth(
+            date.getMonth() + 1
+        );
+
+        const year =
+            date.getFullYear();
+
+        const nextMonth =
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0");
+
+        const endDate =
+            `${year}-${nextMonth}-01`;
+
+
+        // ==========================================
+        // Get budgets
+        // ==========================================
+
+        const budgets =
+            await BudgetModel.getBudgetsByUserAndMonth(
+                user_id,
+                startDate
+            );
+
+
+        // ==========================================
+        // Get actual expenses
+        // ==========================================
+
+        const spending =
+            await BudgetModel
+                .getSpendingByCategoryAndMonth(
+                    user_id,
+                    startDate,
+                    endDate
+                );
+
+
+        // ==========================================
+        // Convert spending into map
+        // ==========================================
+
+        const spendingMap = {};
+
+        spending.forEach(item => {
+
+            spendingMap[item.category] =
+                Number(item.spent);
+
+        });
+
+
+        // ==========================================
+        // Calculate progress
+        // ==========================================
+
+        const result = budgets.map(budget => {
+
+            const budgetAmount =
+                Number(
+                    budget.budget_limit
+                );
+
+            const spent =
+                spendingMap[
+                budget.category
+                ] || 0;
+
+            const remaining =
+                budgetAmount - spent;
+
+            let percentage = 0;
+
+            if (budgetAmount > 0) {
+
+                percentage =
+                    (
+                        spent /
+                        budgetAmount
+                    ) * 100;
+
+            }
+
+
+            // ======================================
+            // Status
+            // ======================================
+
+            let status = "Good";
+
+            if (percentage >= 100) {
+
+                status = "Exceeded";
+
+            } else if (percentage >= 80) {
+
+                status = "Warning";
+
+            }
+
+
+            return {
+
+                id: budget.id,
+
+                category:
+                    budget.category,
+
+                budget:
+                    budgetAmount,
+
+                spent:
+                    spent,
+
+                remaining:
+                    remaining,
+
+                percentage:
+                    Number(
+                        percentage.toFixed(2)
+                    ),
+
+                status:
+                    status,
+
+                month:
+                    budget.month,
+
+                description:
+                    budget.description
+
+            };
+
+        });
+
+
+        return result;
+    }
+
 };
 
-// Create a budget
-const createBudget = async (userId, budgetData) => {
-    const { category, description, limit, month } = budgetData;
-
-    // Validate fields
-    if (!category || typeof category !== "string" || category.trim() === "") {
-        throw new Error("Category is required");
-    }
-    if (limit === undefined || limit === null) {
-        throw new Error("Limit is required");
-    }
-    const numLimit = Number(limit);
-    if (isNaN(numLimit) || numLimit <= 0) {
-        throw new Error("Limit must be a positive number");
-    }
-    if (!month || typeof month !== "string" || month.trim() === "") {
-        throw new Error("Month is required");
-    }
-    if (!isValidDate(month)) {
-        throw new Error("Month must be a valid date (YYYY-MM-DD)");
-    }
-
-    const trimmedDesc = description !== undefined && description !== null ? String(description).trim() : null;
-
-    return await BudgetModel.create({
-        user_id: userId,
-        category: category.trim(),
-        description: trimmedDesc,
-        limit: numLimit,
-        month: month.trim()
-    });
-};
-
-// Get budgets for the logged-in user
-const getBudgets = async (userId) => {
-    return await BudgetModel.getAllByUserId(userId);
-};
-
-// Get a specific budget belonging to the logged-in user
-const getBudgetById = async (id, userId) => {
-    const budget = await BudgetModel.getByIdAndUserId(id, userId);
-    if (!budget) {
-        throw new Error("Budget not found or unauthorized");
-    }
-    return budget;
-};
-
-// Update a budget
-const updateBudget = async (id, userId, budgetData) => {
-    const { category, description, limit, month } = budgetData;
-
-    // Validate fields
-    if (!category || typeof category !== "string" || category.trim() === "") {
-        throw new Error("Category is required");
-    }
-    if (limit === undefined || limit === null) {
-        throw new Error("Limit is required");
-    }
-    const numLimit = Number(limit);
-    if (isNaN(numLimit) || numLimit <= 0) {
-        throw new Error("Limit must be a positive number");
-    }
-    if (!month || typeof month !== "string" || month.trim() === "") {
-        throw new Error("Month is required");
-    }
-    if (!isValidDate(month)) {
-        throw new Error("Month must be a valid date (YYYY-MM-DD)");
-    }
-
-    // Verify ownership and existence
-    const budget = await BudgetModel.getByIdAndUserId(id, userId);
-    if (!budget) {
-        throw new Error("Budget not found or unauthorized");
-    }
-
-    const trimmedDesc = description !== undefined && description !== null ? String(description).trim() : null;
-
-    const updated = await BudgetModel.update(id, userId, {
-        category: category.trim(),
-        description: trimmedDesc,
-        limit: numLimit,
-        month: month.trim()
-    });
-
-    if (!updated) {
-        throw new Error("Failed to update budget");
-    }
-
-    return {
-        id: Number(id),
-        user_id: userId,
-        category: category.trim(),
-        description: trimmedDesc,
-        limit: numLimit,
-        month: month.trim()
-    };
-};
-
-// Delete a budget
-const deleteBudget = async (id, userId) => {
-    // Verify ownership and existence
-    const budget = await BudgetModel.getByIdAndUserId(id, userId);
-    if (!budget) {
-        throw new Error("Budget not found or unauthorized");
-    }
-
-    const deleted = await BudgetModel.delete(id, userId);
-    if (!deleted) {
-        throw new Error("Failed to delete budget");
-    }
-
-    return true;
-};
-
-module.exports = {
-    createBudget,
-    getBudgets,
-    getBudgetById,
-    updateBudget,
-    deleteBudget
-};
+module.exports = BudgetService;
