@@ -6,6 +6,7 @@ import { TransactionListComponent } from './transactions/transaction-list';
 import { BudgetListComponent } from './budgets/budget-list';
 import { CategoryListComponent } from './categories/category-list';
 import { TaxEstimatorComponent } from './tax-estimator/tax-estimator';
+import { ReportsComponent } from './reports/reports';
 import { ComingSoonComponent } from './shared/coming-soon';
 import { authGuard } from './auth/auth.guard';
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'budgets', component: BudgetListComponent, canActivate: [authGuard] },
   { path: 'categories', component: CategoryListComponent, canActivate: [authGuard] },
   { path: 'tax-estimator', component: TaxEstimatorComponent, canActivate: [authGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
   { path: 'coming-soon', component: ComingSoonComponent, canActivate: [authGuard] },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
