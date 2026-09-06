@@ -1,6 +1,6 @@
 # 💰 TaxPal – Personal Finance & Tax Estimator for Freelancers
 
-TaxPal is a modern, full-stack personal finance and real-time tax estimation application crafted specifically for freelancers, gig workers, and self-employed professionals. It provides categorized transaction tracking, monthly budgeting limits with visual progress, regional tax estimation based on slabs, and calendar tracking for quarterly tax deadlines.
+TaxPal is a modern, full-stack personal finance and real-time tax estimation application crafted specifically for freelancers, gig workers, and self-employed professionals. It provides categorized transaction tracking, monthly budgeting limits with visual progress, regional tax estimation based on slabs, calendar tracking for quarterly tax deadlines, and downloadable financial reports (PDF & CSV).
 
 ---
 
@@ -11,7 +11,7 @@ TaxPal is a modern, full-stack personal finance and real-time tax estimation app
 | **Milestone 1: Transaction Logging (Weeks 1–2)** | User Auth (JWT/Bcrypt), Manual Income & Expense Logging, Core Dashboard with KPI cards & Transaction Lists. | ✅ **Completed** |
 | **Milestone 2: Categorization & Budgeting (Weeks 3–4)** | Auto & Manual Category Suggestions, Monthly Spending Limits, Visual Budget Progress & Health Tracking, Category Management. | ✅ **Completed** |
 | **Milestone 3: Tax Estimation (Weeks 5–6)** | Regional Tax Calculation (US & India Tax Slabs, State Tax, Deductions), Quarterly Tax Due Date Calendar & Reminder Alerts. | ✅ **Completed** |
-| **Milestone 4: Reporting & Export (Weeks 7–8)** | Financial Statement Summaries (Income Statement, Expense Report), Monthly/Quarterly Breakdowns, PDF & CSV Export. | ⏳ *In Progress* |
+| **Milestone 4: Reporting & Export (Weeks 7–8)** | Financial Statement Summaries (Income Statement, Expense Report, Tax Summary, Cash Flow), Monthly/Quarterly Breakdowns, PDF & CSV Export. | ✅ **Completed** |
 
 ---
 
@@ -31,7 +31,7 @@ TaxPal is a modern, full-stack personal finance and real-time tax estimation app
 ### 🔐 1. Authentication & User Profile (Milestone 1)
 * **JWT-Based Authentication**: Secure registration and login flows with encrypted passwords via `bcrypt`.
 * **User Profile**: Regional country configuration, income bracket classification, and profile management.
-* **Angular Auth Guards**: Protects all internal application routes.
+* **Angular Auth Guards & Interceptor**: Protects internal routes and automatically attaches bearer tokens to HTTP requests.
 
 ### 💵 2. Transaction Management & Dashboard (Milestone 1)
 * **Income & Expense Entry**: Record transactions with description, amount, category, date, and notes.
@@ -41,15 +41,27 @@ TaxPal is a modern, full-stack personal finance and real-time tax estimation app
 ### 📊 3. Smart Categorization & Budgeting (Milestone 2)
 * **Auto-Categorization**: Intelligent category keyword suggestion engine on transaction entry.
 * **Budget Limits**: Define monthly spending ceilings per category.
-* **Visual Progress Tracking**: Real-time budget health meters (*Good / Warning / Danger*) with remaining budget calculations.
+* **Visual Progress Tracking**: Real-time budget health meters (*Good / Warning / Critical*) with remaining budget calculations.
 * **Category Management**: Create, edit, customize colors, and organize income and expense categories.
 
 ### 🏛️ 4. Regional Tax Estimation Engine & Calendar (Milestone 3)
 * **Tax Calculation by Slabs**:
-  * **India**: New tax regime slabs (0%, 5%, 10%, 15%, 20%, 30%) + cess and freelance business expenses.
-  * **United States**: Federal brackets (10%, 12%, 22%, 24%) + State Tax (California, New York, Texas 0%, Florida 0%) + Self-Employment Tax (15.3%).
+  * **India**: New tax regime progressive slabs (0%, 5%, 10%, 15%, 20%, 30%) + freelance business deductions.
+  * **United States**: Federal brackets (10%, 12%, 22%, 24%) + State Tax (California, New York, Texas, Florida) + Self-Employment Tax (15.3%).
 * **Deduction Engine**: Factor in Business Expenses, Retirement Contributions (SEP IRA, Solo 401(k), PPF), Health Insurance Premiums, and Home Office deductions.
-* **Tax Calendar & Reminders**: Visual schedule of Q1–Q4 estimated tax deadlines with *Upcoming*, *Due Soon*, and *Mark Paid* status workflows.
+* **Tax Calendar & Reminders**: Visual schedule of Q1–Q4 estimated tax deadlines with *Upcoming*, *Due Soon*, and *Mark Resolved* workflows.
+
+### 📄 5. Financial Reporting & PDF/CSV Export (Milestone 4)
+* **Multi-Format Report Generation**:
+  * **Income Statement**: Gross revenue, categorized operating expenses, net income, and profit margins.
+  * **Expense Breakdown**: Percentage distribution of expenses by category with transaction counts.
+  * **Tax Summary**: Taxable profits, itemized deductions, estimated liability, and effective tax rates.
+  * **Cash Flow Summary**: Periodic inflow/outflow balance sheets and savings rates.
+* **Flexible Periods**: Filter by *Current Month*, *Last Month*, *Q1–Q4*, *Full Year*, or *Custom Date Ranges*.
+* **Export Engine**:
+  * **CSV Export**: Generates structured, downloadable spreadsheet files ready for Excel / Google Sheets.
+  * **PDF Export**: Formatted document layout with dedicated `@media print` styling for printing and PDF generation.
+* **Live Document Preview**: Interactive report viewer with KPI summary boxes, category breakdown tables, and itemized transaction rows.
 
 ---
 
@@ -57,7 +69,7 @@ TaxPal is a modern, full-stack personal finance and real-time tax estimation app
 
 * **Frontend**: Angular v21 (Standalone Components, RxJS, Reactive Forms, Chart.js, Vanilla CSS Design System)
 * **Backend**: Node.js, Express.js, JWT, bcrypt
-* **Database**: MySQL / SQLite (`schema.sql` supporting `users`, `transactions`, `budgets`, `categories`, `tax_calculations`, `tax_summaries`, `tax_events`, `alerts`)
+* **Database**: MySQL / SQLite (`schema.sql` supporting `users`, `transactions`, `budgets`, `categories`, `tax_calculations`, `tax_summaries`, `tax_events`, `alerts`, `reports`)
 
 ---
 
