@@ -1,128 +1,133 @@
-const ReportModel =
-    require("../models/reportModel");
+const ReportService = require("../services/reportService");
+const ReportModel = require("../models/reportModel");
 
+const { generateCSV } = require("../utils/csvGenerator");
+const { generatePDF } = require("../utils/pdfGenerator");
 
-// ==========================================
-// GET ALL REPORTS
-// ==========================================
+// ========================================
+// HELPER: GET USER ID
+// ========================================
 
-const getAllReports = async (req, res) => {
-
-    try {
-
-        const userId = req.user.id;
-
-        const reports =
-            await ReportModel.getReportsByUser(
-                userId
-            );
-
-        res.status(200).json({
-
-            success: true,
-
-            reports
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Get reports error:",
-            error
-        );
-
-        res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to fetch reports"
-
-        });
+const getUserId = (req) => {
+    if (!req.user) {
+        throw new Error("User not authenticated");
     }
+
+    // Support both possible JWT payload formats
+    const userId = req.user.id || req.user.user_id;
+
+    if (!userId) {
+        throw new Error("User ID not found in token");
+    }
+
+    return userId;
 };
 
 
+// ========================================
+// MONTHLY REPORT
+// ========================================
 
-// ==========================================
-// GET SINGLE REPORT
-// ==========================================
-
-const getReportById = async (req, res) => {
-
+const getMonthlyReport = async (req, res) => {
     try {
 
-        const userId =
-            req.user.id;
+        const userId = getUserId(req);
+        const { month } = req.query;
 
-        const reportId =
-            req.params.id;
-
-
-        const report =
-            await ReportModel.getReportById(
-                reportId,
-                userId
-            );
-
-
-        if (!report) {
-
-            return res.status(404).json({
-
+        if (!month) {
+            return res.status(400).json({
                 success: false,
-
-                message:
-                    "Report not found"
-
+                message: "Month is required. Use format YYYY-MM."
             });
         }
 
+        const report = await ReportService.getMonthlyReport(
+            userId,
+            month
+        );
 
-        res.status(200).json({
-
+        return res.status(200).json({
             success: true,
-
             report
-
         });
 
     } catch (error) {
 
         console.error(
-            "Get report error:",
+            "Monthly report error:",
             error
         );
 
-        res.status(500).json({
-
+        return res.status(400).json({
             success: false,
-
-            message:
-                "Failed to fetch report"
-
+            message: error.message || "Failed to generate monthly report"
         });
     }
 };
 
 
+// ========================================
+// QUARTERLY REPORT
+// ========================================
 
-// ==========================================
-// SAVE REPORT INFORMATION
-// ==========================================
-//
-// Developer 1 generates/calculates the report.
-// Developer 3 stores report metadata in Reports table.
-//
-
-const saveReport = async (req, res) => {
-
+const getQuarterlyReport = async (req, res) => {
     try {
 
-        const userId =
-            req.user.id;
+        const userId = getUserId(req);
 
+        const {
+            year,
+            quarter
+        } = req.query;
+
+        if (!year) {
+            return res.status(400).json({
+                success: false,
+                message: "Year is required"
+            });
+        }
+
+        if (!quarter) {
+            return res.status(400).json({
+                success: false,
+                message: "Quarter is required"
+            });
+        }
+
+        const report = await ReportService.getQuarterlyReport(
+            userId,
+            year,
+            quarter
+        );
+
+        return res.status(200).json({
+            success: true,
+            report
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Quarterly report error:",
+            error
+        );
+
+        return res.status(400).json({
+            success: false,
+            message: error.message || "Failed to generate quarterly report"
+        });
+    }
+};
+
+
+// ========================================
+// SAVE REPORT
+// ========================================
+
+const saveReport = async (req, res) => {
+    try {
+
+        const userId = getUserId(req);
 
         const {
             period,
@@ -130,74 +135,41 @@ const saveReport = async (req, res) => {
             filePath
         } = req.body;
 
-
-        // Validation
-
         if (!period) {
-
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "period is required"
-
+                message: "period is required"
             });
         }
-
 
         if (!reportType) {
-
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "reportType is required"
-
+                message: "reportType is required"
             });
         }
-
 
         if (
-            reportType !== "monthly" &&
-            reportType !== "quarterly"
+            !["monthly", "quarterly"].includes(reportType)
         ) {
-
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "reportType must be monthly or quarterly"
-
             });
         }
 
+        const reportId = await ReportModel.createReport(
+            userId,
+            period,
+            reportType,
+            filePath || null
+        );
 
-        const reportId =
-            await ReportModel.createReport(
-
-                userId,
-
-                period,
-
-                reportType,
-
-                filePath || null
-
-            );
-
-
-        res.status(201).json({
-
+        return res.status(201).json({
             success: true,
-
-            message:
-                "Report saved successfully",
-
+            message: "Report saved successfully",
             reportId
-
         });
 
     } catch (error) {
@@ -207,54 +179,65 @@ const saveReport = async (req, res) => {
             error
         );
 
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message:
-                "Failed to save report"
-
+                error.message || "Failed to save report"
         });
     }
 };
 
 
+// ========================================
+// GET ALL SAVED REPORTS
+// ========================================
 
-// ==========================================
-// UPDATE REPORT FILE
-// ==========================================
-//
-// Developer 2 can use this after creating
-// PDF/CSV.
-//
-
-const updateReportFile = async (req, res) => {
-
+const getAllReports = async (req, res) => {
     try {
 
-        const userId =
-            req.user.id;
+        const userId = getUserId(req);
 
-        const reportId =
-            req.params.id;
+        const reports =
+            await ReportModel.getReportsByUser(userId);
 
-        const {
-            filePath
-        } = req.body;
+        return res.status(200).json({
+            success: true,
+            reports
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Get reports error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message || "Failed to fetch reports"
+        });
+    }
+};
 
 
-        if (!filePath) {
+// ========================================
+// GET ONE SAVED REPORT
+// ========================================
 
+const getReportById = async (req, res) => {
+    try {
+
+        const userId = getUserId(req);
+
+        const reportId = req.params.id;
+
+        if (!reportId) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "filePath is required"
-
+                message: "Report ID is required"
             });
         }
-
 
         const report =
             await ReportModel.getReportById(
@@ -262,68 +245,205 @@ const updateReportFile = async (req, res) => {
                 userId
             );
 
-
         if (!report) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Report not found"
-
+                message: "Report not found"
             });
         }
 
-
-        await ReportModel.updateFilePath(
-
-            reportId,
-
-            userId,
-
-            filePath
-
-        );
-
-
-        res.status(200).json({
-
+        return res.status(200).json({
             success: true,
-
-            message:
-                "Report file updated successfully"
-
+            report
         });
 
     } catch (error) {
 
         console.error(
-            "Update report file error:",
+            "Get report error:",
             error
         );
 
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-
             message:
-                "Failed to update report file"
-
+                error.message || "Failed to fetch report"
         });
     }
 };
 
 
+// ========================================
+// CSV EXPORT
+// ========================================
+
+const exportCSV = async (req, res) => {
+    try {
+
+        const userId = getUserId(req);
+
+        const {
+            month,
+            year,
+            quarter
+        } = req.query;
+
+        let report;
+
+        // MONTHLY
+        if (month) {
+
+            report =
+                await ReportService.getMonthlyReport(
+                    userId,
+                    month
+                );
+
+        }
+
+        // QUARTERLY
+        else if (year && quarter) {
+
+            report =
+                await ReportService.getQuarterlyReport(
+                    userId,
+                    year,
+                    quarter
+                );
+
+        }
+
+        // INVALID REQUEST
+        else {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Provide month OR year and quarter"
+            });
+        }
+
+        const csv = generateCSV(report);
+
+        res.setHeader(
+            "Content-Type",
+            "text/csv"
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${report.period}-report.csv"`
+        );
+
+        return res.status(200).send(csv);
+
+    } catch (error) {
+
+        console.error(
+            "CSV export error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message || "Failed to export CSV"
+        });
+    }
+};
+
+
+// ========================================
+// PDF EXPORT
+// ========================================
+
+const exportPDF = async (req, res) => {
+    try {
+
+        const userId = getUserId(req);
+
+        const {
+            month,
+            year,
+            quarter
+        } = req.query;
+
+        let report;
+
+        // MONTHLY
+        if (month) {
+
+            report =
+                await ReportService.getMonthlyReport(
+                    userId,
+                    month
+                );
+
+        }
+
+        // QUARTERLY
+        else if (year && quarter) {
+
+            report =
+                await ReportService.getQuarterlyReport(
+                    userId,
+                    year,
+                    quarter
+                );
+
+        }
+
+        // INVALID REQUEST
+        else {
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Provide month OR year and quarter"
+            });
+        }
+
+        res.setHeader(
+            "Content-Type",
+            "application/pdf"
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${report.period}-report.pdf"`
+        );
+
+        return generatePDF(
+            report,
+            res
+        );
+
+    } catch (error) {
+
+        console.error(
+            "PDF export error:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                error.message || "Failed to export PDF"
+        });
+    }
+};
+
+
+// ========================================
+// EXPORT CONTROLLERS
+// ========================================
 
 module.exports = {
-
-    getAllReports,
-
-    getReportById,
-
+    getMonthlyReport,
+    getQuarterlyReport,
     saveReport,
-
-    updateReportFile
-
+    getAllReports,
+    getReportById,
+    exportCSV,
+    exportPDF
 };

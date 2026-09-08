@@ -760,16 +760,7 @@ Chart.register(...registerables);
               [attr.disabled]="editingId ? true : null">
 
               <option
-                value=""
-                disabled
-                selected>
-
-                Select a category
-
-              </option>
-
-              <option
-                *ngFor="let cat of expenseCategories"
+                *ngFor="let cat of availableExpenseCategories"
                 [value]="cat.name">
 
                 {{ cat.name }}
@@ -1345,6 +1336,25 @@ export class BudgetListComponent
 
   expenseCategories: CategoryItem[] = [];
 
+  // Fallback categories keep the budget form usable even when
+  // the CategoryService has not returned any expense categories yet.
+  private readonly fallbackExpenseCategories: CategoryItem[] = [
+    { name: 'Food', color: '#0ea5e9' } as CategoryItem,
+    { name: 'Rent', color: '#8b5cf6' } as CategoryItem,
+    { name: 'Transport', color: '#10b981' } as CategoryItem,
+    { name: 'Shopping', color: '#f59e0b' } as CategoryItem,
+    { name: 'Entertainment', color: '#ec4899' } as CategoryItem,
+    { name: 'Utilities', color: '#6366f1' } as CategoryItem,
+    { name: 'Healthcare', color: '#ef4444' } as CategoryItem,
+    { name: 'Education', color: '#14b8a6' } as CategoryItem
+  ];
+
+  get availableExpenseCategories(): CategoryItem[] {
+    return this.expenseCategories.length > 0
+      ? this.expenseCategories
+      : this.fallbackExpenseCategories;
+  }
+
   currencySymbol = '₹';
 
 
@@ -1439,7 +1449,12 @@ export class BudgetListComponent
     this.expenseCategories =
       this.categoryService.getCategoriesByType(
         'expense'
-      );
+      ) || [];
+
+    console.log(
+      'Expense categories loaded:',
+      this.expenseCategories
+    );
 
 
     this.subs.add(
@@ -1723,7 +1738,7 @@ export class BudgetListComponent
   ): string {
 
     const cat =
-      this.expenseCategories.find(
+      this.availableExpenseCategories.find(
         c =>
           c.name === categoryName
       );
@@ -1888,10 +1903,15 @@ export class BudgetListComponent
 
     this.editingId = null;
 
+    // Select the first expense category automatically.
+    // This prevents the first-time budget form from opening
+    // with an empty/invalid category.
+    const defaultCategory =
+      this.availableExpenseCategories[0]?.name || 'Food';
 
     this.budgetForm.reset({
 
-      category: '',
+      category: defaultCategory,
 
       limit: null,
 
@@ -1902,8 +1922,10 @@ export class BudgetListComponent
 
     });
 
-
     this.isModalOpen = true;
+
+    // Update the reactive form/select immediately.
+    this.cdr.detectChanges();
 
   }
 

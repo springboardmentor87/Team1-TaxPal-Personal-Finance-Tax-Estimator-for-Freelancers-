@@ -2,6 +2,9 @@ const db = require("../config/db");
 
 const TaxModel = {
 
+    // ==========================================
+    // Get Tax Summary
+    // ==========================================
     getTaxSummary: async (user_id, year) => {
 
         const query = `
@@ -39,9 +42,11 @@ const TaxModel = {
             [user_id, year]
         );
 
-        return rows[0];
+        return rows[0] || {
+            total_income: 0,
+            total_expenses: 0
+        };
     }
-
 };
 
 module.exports = TaxModel;

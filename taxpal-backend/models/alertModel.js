@@ -3,7 +3,6 @@ const db = require("../config/db");
 const AlertModel = {
 
     createAlert: async (alertData) => {
-
         const {
             user_id,
             title,
@@ -25,7 +24,7 @@ const AlertModel = {
             VALUES (?, ?, ?, ?, ?, ?)
         `;
 
-        const [result] = await db.execute(
+        const [result] = await db.promise().execute(
             query,
             [
                 user_id,
@@ -43,9 +42,7 @@ const AlertModel = {
         };
     },
 
-
     getAlertsByUser: async (user_id) => {
-
         const query = `
             SELECT *
             FROM alerts
@@ -53,7 +50,7 @@ const AlertModel = {
             ORDER BY due_date ASC
         `;
 
-        const [rows] = await db.execute(
+        const [rows] = await db.promise().execute(
             query,
             [user_id]
         );
@@ -61,9 +58,7 @@ const AlertModel = {
         return rows;
     },
 
-
     markAsRead: async (id, user_id) => {
-
         const query = `
             UPDATE alerts
             SET is_read = 1
@@ -71,7 +66,7 @@ const AlertModel = {
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const [result] = await db.promise().execute(
             query,
             [id, user_id]
         );
@@ -79,9 +74,7 @@ const AlertModel = {
         return result;
     },
 
-
     markAsResolved: async (id, user_id) => {
-
         const query = `
             UPDATE alerts
             SET is_resolved = 1
@@ -89,7 +82,7 @@ const AlertModel = {
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const [result] = await db.promise().execute(
             query,
             [id, user_id]
         );
@@ -97,23 +90,20 @@ const AlertModel = {
         return result;
     },
 
-
     deleteAlert: async (id, user_id) => {
-
         const query = `
             DELETE FROM alerts
             WHERE id = ?
             AND user_id = ?
         `;
 
-        const [result] = await db.execute(
+        const [result] = await db.promise().execute(
             query,
             [id, user_id]
         );
 
         return result;
     }
-
 };
 
 module.exports = AlertModel;

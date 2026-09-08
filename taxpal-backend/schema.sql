@@ -124,19 +124,12 @@ CREATE TABLE alerts (
 
 CREATE TABLE IF NOT EXISTS reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
-
     user_id INT NOT NULL,
-
     period VARCHAR(50) NOT NULL,
-
     report_type VARCHAR(30) NOT NULL,
-
     file_path VARCHAR(500),
-
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE
 );
-

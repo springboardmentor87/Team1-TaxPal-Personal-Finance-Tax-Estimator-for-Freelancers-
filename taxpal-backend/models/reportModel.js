@@ -2,53 +2,65 @@ const db = require("../config/db");
 
 const ReportModel = {
 
-    // Get all reports belonging to logged-in user
-    getReportsByUser: async (userId) => {
+    // ========================================
+    // GET INCOME AND EXPENSE FOR A PERIOD
+    // ========================================
+    getIncomeExpense: async (userId, startDate, endDate) => {
 
-        const [rows] = await db.query(
-            `SELECT
-                id,
-                user_id,
-                period,
-                report_type,
-                file_path,
-                created_at
-             FROM reports
-             WHERE user_id = ?
-             ORDER BY created_at DESC`,
-            [userId]
+        const sql = `
+            SELECT
+                type,
+                COALESCE(SUM(amount), 0) AS total
+            FROM transactions
+            WHERE user_id = ?
+              AND transaction_date >= ?
+              AND transaction_date < ?
+            GROUP BY type
+        `;
+
+        const [results] = await db.promise().query(
+            sql,
+            [userId, startDate, endDate]
         );
 
-        return rows;
+        return results;
     },
 
 
-    // Get one report
-    // IMPORTANT:
-    // user_id is checked so one user cannot access
-    // another user's report.
-    getReportById: async (reportId, userId) => {
+    // ========================================
+    // GET EXPENSE BY CATEGORY
+    // ========================================
+    getExpenseByCategory: async (
+        userId,
+        startDate,
+        endDate
+    ) => {
 
-        const [rows] = await db.query(
-            `SELECT
-                id,
-                user_id,
-                period,
-                report_type,
-                file_path,
-                created_at
-             FROM reports
-             WHERE id = ?
-             AND user_id = ?
-             LIMIT 1`,
-            [reportId, userId]
+        const sql = `
+            SELECT
+                category,
+                COALESCE(SUM(amount), 0) AS total
+            FROM transactions
+            WHERE user_id = ?
+              AND LOWER(type) = 'expense'
+              AND transaction_date >= ?
+              AND transaction_date < ?
+            GROUP BY category
+            ORDER BY total DESC
+        `;
+
+        const [results] = await db.promise().query(
+            sql,
+            [userId, startDate, endDate]
         );
 
-        return rows[0];
+        return results;
     },
 
 
-    // Save report information
+    // ========================================
+    // CREATE / SAVE REPORT
+    // ========================================
     createReport: async (
         userId,
         period,
@@ -56,10 +68,19 @@ const ReportModel = {
         filePath = null
     ) => {
 
-        const [result] = await db.query(
-            `INSERT INTO reports
-                (user_id, period, report_type, file_path)
-             VALUES (?, ?, ?, ?)`,
+        const sql = `
+            INSERT INTO reports
+            (
+                user_id,
+                period,
+                report_type,
+                file_path
+            )
+            VALUES (?, ?, ?, ?)
+        `;
+
+        const [result] = await db.promise().query(
+            sql,
             [
                 userId,
                 period,
@@ -72,27 +93,91 @@ const ReportModel = {
     },
 
 
-    // Update file path after Developer 2
-    // generates PDF/CSV
+    // ========================================
+    // GET ALL REPORTS OF USER
+    // ========================================
+    getReportsByUser: async (userId) => {
+
+        const sql = `
+            SELECT
+                id,
+                user_id,
+                period,
+                report_type,
+                file_path,
+                created_at
+            FROM reports
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        `;
+
+        const [results] = await db.query(
+            sql,
+            [userId]
+        );
+
+        return results;
+    },
+
+
+
+    getReportById: async (
+        reportId,
+        userId
+    ) => {
+
+        const sql = `
+            SELECT
+                id,
+                user_id,
+                period,
+                report_type,
+                file_path,
+                created_at
+            FROM reports
+            WHERE id = ?
+              AND user_id = ?
+            LIMIT 1
+        `;
+
+        const [results] = await db.promise().query(
+            sql,
+            [reportId, userId]
+        );
+
+        return results.length > 0
+            ? results[0]
+            : null;
+    },
+
+
+    // ========================================
+    // UPDATE REPORT FILE PATH
+    // ========================================
     updateFilePath: async (
         reportId,
         userId,
         filePath
     ) => {
 
-        await db.query(
-            `UPDATE reports
-             SET file_path = ?
-             WHERE id = ?
-             AND user_id = ?`,
+        const sql = `
+            UPDATE reports
+            SET file_path = ?
+            WHERE id = ?
+              AND user_id = ?
+        `;
+
+        const [result] = await db.promise().query(
+            sql,
             [
                 filePath,
                 reportId,
                 userId
             ]
         );
-    }
 
+        return result;
+    }
 };
 
 module.exports = ReportModel;

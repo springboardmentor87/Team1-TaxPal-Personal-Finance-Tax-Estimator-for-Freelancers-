@@ -2,6 +2,9 @@ const db = require("../config/db");
 
 const TaxEventModel = {
 
+    // ==========================================
+    // Create Tax Event
+    // ==========================================
     createTaxEvent: async (eventData) => {
 
         const {
@@ -44,6 +47,9 @@ const TaxEventModel = {
     },
 
 
+    // ==========================================
+    // Get All Tax Events By User
+    // ==========================================
     getTaxEventsByUser: async (user_id) => {
 
         const query = `
@@ -62,20 +68,20 @@ const TaxEventModel = {
     },
 
 
-    getTaxEventsByMonth: async (
-        user_id,
-        month
-    ) => {
+    // ==========================================
+    // Get Tax Events By Month
+    // ==========================================
+    getTaxEventsByMonth: async (user_id, month) => {
 
         const query = `
             SELECT *
             FROM tax_events
             WHERE user_id = ?
-            AND strftime('%m', due_date) = ?
+            AND MONTH(due_date) = ?
             ORDER BY due_date ASC
         `;
 
-        const rows = await db.all(
+        const [rows] = await db.execute(
             query,
             [user_id, month]
         );
@@ -84,6 +90,9 @@ const TaxEventModel = {
     },
 
 
+    // ==========================================
+    // Update Tax Event
+    // ==========================================
     updateTaxEvent: async (
         id,
         user_id,
@@ -100,7 +109,6 @@ const TaxEventModel = {
 
         const query = `
             UPDATE tax_events
-
             SET
                 title = COALESCE(?, title),
                 description = COALESCE(?, description),
@@ -112,27 +120,28 @@ const TaxEventModel = {
             AND user_id = ?
         `;
 
-        const result = await db.run(
+        const [result] = await db.execute(
             query,
             [
-                title || null,
-                description || null,
-                due_date || null,
-                quarter || null,
-                is_custom !== undefined
-                    ? is_custom
-                    : null,
+                title !== undefined ? title : null,
+                description !== undefined ? description : null,
+                due_date !== undefined ? due_date : null,
+                quarter !== undefined ? quarter : null,
+                is_custom !== undefined ? is_custom : null,
                 id,
                 user_id
             ]
         );
 
         return {
-            affectedRows: result.changes
+            affectedRows: result.affectedRows
         };
     },
 
 
+    // ==========================================
+    // Mark Tax Event As Completed
+    // ==========================================
     markAsCompleted: async (
         id,
         user_id
@@ -145,17 +154,20 @@ const TaxEventModel = {
             AND user_id = ?
         `;
 
-        const result = await db.run(
+        const [result] = await db.execute(
             query,
             [id, user_id]
         );
 
         return {
-            affectedRows: result.changes
+            affectedRows: result.affectedRows
         };
     },
 
 
+    // ==========================================
+    // Delete Tax Event
+    // ==========================================
     deleteTaxEvent: async (
         id,
         user_id
@@ -167,16 +179,15 @@ const TaxEventModel = {
             AND user_id = ?
         `;
 
-        const result = await db.run(
+        const [result] = await db.execute(
             query,
             [id, user_id]
         );
 
         return {
-            affectedRows: result.changes
+            affectedRows: result.affectedRows
         };
     }
-
 };
 
 module.exports = TaxEventModel;
