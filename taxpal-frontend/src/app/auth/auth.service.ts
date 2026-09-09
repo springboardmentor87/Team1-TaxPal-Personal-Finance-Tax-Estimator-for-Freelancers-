@@ -15,7 +15,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://team1-taxpal-personal-finance-tax.onrender.com/api';
+  private readonly API_URL = 'https://team1-taxpal-personal-finance-tax.onrender.com/api/auth';
   private readonly TOKEN_KEY = 'taxpal_auth_token';
   private readonly CURRENT_USER_KEY = 'taxpal_current_user';
 
