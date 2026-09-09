@@ -32,7 +32,7 @@ export interface BudgetSummary {
 })
 export class BudgetService {
 
-  private apiUrl = 'http://localhost:8080/api/budgets';
+  private apiUrl = 'https://team1-taxpal-personal-finance-tax.onrender.com/api/budgets';
 
   private budgetsSubject =
     new BehaviorSubject<BudgetProgress[]>([]);

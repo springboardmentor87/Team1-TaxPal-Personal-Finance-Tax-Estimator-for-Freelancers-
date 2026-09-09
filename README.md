@@ -102,7 +102,7 @@ mysql -u root -p < taxpal-backend/schema.sql
    ```bash
    npm start
    ```
-   *The server will run on `http://localhost:5000`.*
+   *The server will run on `https://team1-taxpal-personal-finance-tax.onrender.com`.*
 
 ---
 

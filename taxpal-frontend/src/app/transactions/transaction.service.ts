@@ -8,7 +8,7 @@ import { Transaction } from './transaction.model';
   providedIn: 'root'
 })
 export class TransactionService {
-  private readonly API_URL = 'http://localhost:8080/api/transactions';
+  private readonly API_URL = 'https://team1-taxpal-personal-finance-tax.onrender.com/api/transactions';
 
   private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();

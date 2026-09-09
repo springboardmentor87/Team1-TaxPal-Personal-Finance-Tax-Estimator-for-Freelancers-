@@ -22,7 +22,7 @@ import {
 export class ReportService {
 
     private readonly API_URL =
-        'http://localhost:8080/api/reports';
+        'https://team1-taxpal-personal-finance-tax.onrender.com/api/reports';
 
     private reportsSubject =
         new BehaviorSubject<GeneratedReport[]>([]);

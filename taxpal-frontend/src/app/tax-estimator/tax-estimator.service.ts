@@ -73,8 +73,7 @@ export interface TaxReminder {
 })
 export class TaxEstimatorService {
 
-  private apiUrl = 'http://localhost:8080/api';
-
+  private apiUrl = 'https://team1-taxpal-personal-finance-tax.onrender.com/api';
   constructor(private http: HttpClient) { }
 
 

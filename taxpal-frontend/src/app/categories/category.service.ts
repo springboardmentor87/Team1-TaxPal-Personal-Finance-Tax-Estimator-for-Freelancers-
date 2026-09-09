@@ -23,7 +23,7 @@ export interface CategoryItem {
 export class CategoryService {
 
   private readonly API_URL =
-    'http://localhost:8080/api/categories';
+    'https://team1-taxpal-personal-finance-tax.onrender.com/api/categories';
 
   private categoriesSubject =
     new BehaviorSubject<CategoryItem[]>([]);
