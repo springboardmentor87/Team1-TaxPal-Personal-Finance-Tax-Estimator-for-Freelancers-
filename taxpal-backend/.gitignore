@@ -2,7 +2,4 @@ node_modules/
 .angular/
 dist/
 .env
-controllers/reportController.js
-reportModel.js
-reportRoute.js
-reportService.js
+
