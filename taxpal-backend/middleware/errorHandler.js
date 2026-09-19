@@ -9,7 +9,7 @@ const errorHandler = (
 
     err.status =
         err.status || "error";
-
+    // default error handler
     if (process.env.NODE_ENV === "development") {
 
         return res
