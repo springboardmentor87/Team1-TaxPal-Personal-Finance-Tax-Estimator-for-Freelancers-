@@ -15,7 +15,9 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://team1-taxpal-personal-finance-tax.onrender.com/api/auth';
+  private readonly API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:8080/api/auth'
+    : 'https://team1-taxpal-personal-finance-tax.onrender.com/api/auth';
   private readonly TOKEN_KEY = 'taxpal_auth_token';
   private readonly CURRENT_USER_KEY = 'taxpal_current_user';
 
@@ -88,6 +90,19 @@ export class AuthService {
         const errorMsg = err.error?.message || err.message || 'Registration failed';
         return of({ success: false, error: errorMsg });
       })
+    );
+  }
+
+  resetPassword(email: string, password: string): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<AuthResponse>(`${this.API_URL}/reset-password`, {
+      email,
+      password
+    }).pipe(
+      map(res => ({ success: !!res.success, error: res.success ? undefined : res.message || 'Unable to reset password' })),
+      catchError(err => of({
+        success: false,
+        error: err.error?.message || err.message || 'Unable to reset password'
+      }))
     );
   }
 

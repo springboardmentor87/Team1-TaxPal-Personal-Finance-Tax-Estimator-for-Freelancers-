@@ -34,6 +34,21 @@ const UserModel = {
         });
     },
 
+    updatePasswordByEmail: (email, password) => {
+        return new Promise((resolve, reject) => {
+            db.query(
+                "UPDATE users SET password = ? WHERE email = ?",
+                [password, email],
+                (err, result) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve(result.affectedRows > 0);
+                }
+            );
+        });
+    },
+
     // Create new user
     createUser: (userData) => {
 

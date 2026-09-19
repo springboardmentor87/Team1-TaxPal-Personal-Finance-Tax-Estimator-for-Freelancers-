@@ -7,11 +7,11 @@ export interface TaxCalculationParams {
   state?: string;
   filingStatus: 'single' | 'married_joint' | 'head_of_household';
   quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
-  grossIncome: number;
-  businessExpenses: number;
-  retirementContributions: number;
-  healthInsurancePremiums: number;
-  homeOfficeDeduction: number;
+  grossIncome: number | null;
+  businessExpenses: number | null;
+  retirementContributions: number | null;
+  healthInsurancePremiums: number | null;
+  homeOfficeDeduction: number | null;
 }
 
 export interface TaxEstimateResult {
@@ -73,8 +73,14 @@ export interface TaxReminder {
 })
 export class TaxEstimatorService {
 
-  private apiUrl = 'https://team1-taxpal-personal-finance-tax.onrender.com/api';
+  private apiUrl = this.getApiUrl();
   constructor(private http: HttpClient) { }
+
+  private getApiUrl(): string {
+    return typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? 'http://localhost:8080/api'
+      : 'https://team1-taxpal-personal-finance-tax.onrender.com/api';
+  }
 
 
   // =========================================================
@@ -91,7 +97,12 @@ export class TaxEstimatorService {
       `${this.apiUrl}/tax/calculate`,
       {
         year,
-        ...params
+        ...params,
+        grossIncome: params.grossIncome ?? 0,
+        businessExpenses: params.businessExpenses ?? 0,
+        retirementContributions: params.retirementContributions ?? 0,
+        healthInsurancePremiums: params.healthInsurancePremiums ?? 0,
+        homeOfficeDeduction: params.homeOfficeDeduction ?? 0
       }
     ).pipe(
 

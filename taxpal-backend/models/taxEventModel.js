@@ -2,9 +2,7 @@ const db = require("../config/db");
 
 const TaxEventModel = {
 
-    // ==========================================
-    // Create Tax Event
-    // ==========================================
+  
     createTaxEvent: async (eventData) => {
 
         const {
@@ -46,10 +44,6 @@ const TaxEventModel = {
         };
     },
 
-
-    // ==========================================
-    // Get All Tax Events By User
-    // ==========================================
     getTaxEventsByUser: async (user_id) => {
 
         const query = `
@@ -67,10 +61,6 @@ const TaxEventModel = {
         return rows;
     },
 
-
-    // ==========================================
-    // Get Tax Events By Month
-    // ==========================================
     getTaxEventsByMonth: async (user_id, month) => {
 
         const query = `
@@ -90,9 +80,6 @@ const TaxEventModel = {
     },
 
 
-    // ==========================================
-    // Update Tax Event
-    // ==========================================
     updateTaxEvent: async (
         id,
         user_id,
@@ -139,9 +126,6 @@ const TaxEventModel = {
     },
 
 
-    // ==========================================
-    // Mark Tax Event As Completed
-    // ==========================================
     markAsCompleted: async (
         id,
         user_id
@@ -165,9 +149,7 @@ const TaxEventModel = {
     },
 
 
-    // ==========================================
-    // Delete Tax Event
-    // ==========================================
+
     deleteTaxEvent: async (
         id,
         user_id

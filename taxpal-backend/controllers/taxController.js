@@ -17,21 +17,19 @@ const calculateTax = asyncHandler(async (req, res) => {
         homeOfficeDeduction
     } = req.body;
 
-    const taxData = await TaxService.calculateTax(
+    const taxData = await TaxService.calculateTax({
         user_id,
-        year || new Date().getFullYear(),
-        {
-            country,
-            state,
-            filingStatus,
-            quarter,
-            grossIncome,
-            businessExpenses,
-            retirementContributions,
-            healthInsurancePremiums,
-            homeOfficeDeduction
-        }
-    );
+        year: year || new Date().getFullYear(),
+        country,
+        state,
+        filingStatus,
+        quarter,
+        grossIncome,
+        businessExpenses,
+        retirementContributions,
+        healthInsurancePremiums,
+        homeOfficeDeduction
+    });
 
     return res.status(200).json({
         success: true,

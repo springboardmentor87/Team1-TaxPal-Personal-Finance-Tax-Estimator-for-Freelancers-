@@ -22,7 +22,9 @@ import {
 export class ReportService {
 
     private readonly API_URL =
-        'https://team1-taxpal-personal-finance-tax.onrender.com/api/reports';
+        typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? 'http://localhost:8080/api/reports'
+            : 'https://team1-taxpal-personal-finance-tax.onrender.com/api/reports';
 
     private reportsSubject =
         new BehaviorSubject<GeneratedReport[]>([]);
@@ -51,21 +53,11 @@ export class ReportService {
     // ============================================================
 
     private getAuthHeaders(): HttpHeaders {
-
         const token = this.authService.getToken();
-
-        let headers = new HttpHeaders({
-            'Content-Type': 'application/json'
+        return new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (token || '')
         });
-
-        if (token) {
-            headers = headers.set(
-                'Authorization',
-                `Bearer ${token}`
-            );
-        }
-
-        return headers;
     }
 
     // ============================================================
@@ -1850,7 +1842,34 @@ export class ReportService {
     // ============================================================
 
     public printOrSavePDF(): void {
+        window.requestAnimationFrame(() => window.print());
+    }
 
-        window.print();
+    public downloadPDF(report: GeneratedReport): void {
+        const startDate = report.data.startDate;
+        const date = new Date(`${startDate}T00:00:00`);
+        const params = new URLSearchParams();
+
+        if (report.period === 'Current Month' || report.period === 'Last Month') {
+            params.set('month', startDate.slice(0, 7));
+        } else {
+            const quarter = Math.floor(date.getMonth() / 3) + 1;
+            params.set('year', String(date.getFullYear()));
+            params.set('quarter', `Q${quarter}`);
+        }
+
+        this.http.get(`${this.API_URL}/export/pdf?${params.toString()}`, {
+            headers: this.getAuthHeaders(),
+            responseType: 'blob'
+        }).subscribe({
+            next: blob => {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${report.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            },
+            error: error => console.error('PDF export failed:', error)
+        });
     }
 }

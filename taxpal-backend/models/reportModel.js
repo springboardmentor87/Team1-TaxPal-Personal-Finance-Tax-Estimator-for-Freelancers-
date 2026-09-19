@@ -57,6 +57,17 @@ const ReportModel = {
         return results;
     },
 
+    getTransactions: async (userId, startDate, endDate) => {
+        const sql = `
+            SELECT id, transaction_date, title, category, type, amount
+            FROM transactions
+            WHERE user_id = ? AND transaction_date >= ? AND transaction_date < ?
+            ORDER BY transaction_date ASC, id ASC
+        `;
+        const [results] = await db.promise().query(sql, [userId, startDate, endDate]);
+        return results;
+    },
+
 
     // ========================================
     // CREATE / SAVE REPORT

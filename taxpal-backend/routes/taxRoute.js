@@ -6,7 +6,7 @@ const TaxController = require("../controllers/taxController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.get(
+router.post(
     "/calculate",
     authMiddleware,
     TaxController.calculateTax

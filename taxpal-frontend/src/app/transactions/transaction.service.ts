@@ -4,83 +4,76 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth/auth.service';
 import { Transaction } from './transaction.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TransactionService {
-  private readonly API_URL = 'https://team1-taxpal-personal-finance-tax.onrender.com/api/transactions';
-
+  private readonly API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:8080/api/transactions'
+    : 'https://team1-taxpal-personal-finance-tax.onrender.com/api/transactions';
   private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        this.loadTransactions();
-      } else {
-        this.transactionsSubject.next([]);
-      }
+      if (user) this.loadTransactions();
+      else this.transactionsSubject.next([]);
     });
   }
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+    const authValue = ['Bearer', token || ''].join(' ');
+    return new HttpHeaders().set('Authorization', authValue);
   }
 
   public loadTransactions(): void {
-    const headers = this.getAuthHeaders();
-    this.http.get<{ success: boolean; data: any[] }>(`${this.API_URL}/get`, { headers }).subscribe({
-      next: (res) => {
+    this.http.get<{ success: boolean; data: any[] }>(`${this.API_URL}/get`, {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: res => {
         if (res.success && Array.isArray(res.data)) {
-          const mapped: Transaction[] = res.data.map(item => ({
+          this.transactionsSubject.next(res.data.map(item => ({
             id: item.id ? item.id.toString() : '',
             user_id: item.user_id ? item.user_id.toString() : '',
             description: item.title || item.description || '',
             amount: Number(item.amount),
             type: (item.type || '').toLowerCase() as 'income' | 'expense',
             category: item.category,
-            date: item.transaction_date || item.date
-          }));
-          this.transactionsSubject.next(mapped);
+            date: item.transaction_date || item.date,
+            notes: item.notes
+          })));
         }
       },
-      error: (err) => {
-        console.error('Failed to fetch transactions from backend:', err);
-      }
+      error: err => console.error('Failed to fetch transactions from backend:', err)
     });
   }
 
   addTransaction(transaction: Omit<Transaction, 'id' | 'user_id'>): void {
-    const headers = this.getAuthHeaders();
     const payload = {
       title: transaction.description || transaction.category || 'Transaction',
       amount: transaction.amount,
       type: transaction.type === 'income' ? 'Income' : 'Expense',
       category: transaction.category,
-      transaction_date: transaction.date
+      transaction_date: transaction.date,
+      notes: transaction.notes
     };
-
-    this.http.post<{ success: boolean }>(`${this.API_URL}/add`, payload, { headers }).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.loadTransactions();
-        }
-      },
-      error: (err) => {
-        console.error('Failed to add transaction to backend:', err);
-      }
+    this.http.post<{ success: boolean }>(`${this.API_URL}/add`, payload, {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: res => { if (res.success) this.loadTransactions(); },
+      error: err => console.error('Failed to add transaction to backend:', err)
     });
   }
 
   deleteTransaction(id: string): void {
-    // Optimistic UI update or refresh after deletion
-    const current = this.transactionsSubject.value.filter(t => t.id !== id);
-    this.transactionsSubject.next(current);
+    this.http.delete<{ success: boolean }>(
+      `${this.API_URL}/delete/${encodeURIComponent(id)}`,
+      { headers: this.getAuthHeaders() }
+    ).subscribe({
+      next: res => { if (res.success) this.loadTransactions(); },
+      error: err => {
+        console.error('Failed to delete transaction from backend:', err);
+        this.loadTransactions();
+      }
+    });
   }
 }

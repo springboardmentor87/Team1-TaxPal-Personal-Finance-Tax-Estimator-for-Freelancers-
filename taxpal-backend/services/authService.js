@@ -106,7 +106,27 @@ const login = async (loginData) => {
     };
 };
 
+const resetPassword = async ({ email, password }) => {
+    if (!email || !password) {
+        throw new Error("Email and new password are required");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        throw new Error("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.");
+    }
+
+    const user = await UserModel.findByEmail(email);
+    if (!user) {
+        throw new Error("No account found for this email address");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await UserModel.updatePasswordByEmail(email, hashedPassword);
+};
+
 module.exports = {
     register,
-    login
+    login,
+    resetPassword
 };

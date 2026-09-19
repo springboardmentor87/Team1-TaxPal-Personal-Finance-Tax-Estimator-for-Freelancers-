@@ -403,6 +403,9 @@ const exportPDF = async (req, res) => {
             });
         }
 
+        report.userName = req.user.name || req.user.username || "TaxPal User";
+        report.userEmail = req.user.email || "—";
+
         res.setHeader(
             "Content-Type",
             "application/pdf"

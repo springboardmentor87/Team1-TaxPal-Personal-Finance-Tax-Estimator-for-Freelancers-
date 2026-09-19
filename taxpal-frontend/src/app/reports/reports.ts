@@ -1035,24 +1035,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   onGenerateReport(): void {
     this.isGenerating = true;
-    setTimeout(() => {
-      const newRep = this.reportService.generateReport(
-        this.selectedType,
-        this.selectedPeriod,
-        this.selectedFormat,
-        this.customStartDate,
-        this.customEndDate,
-        this.transactions
-      );
-      this.activeReport = newRep;
-      this.isGenerating = false;
-      this.showToast(`Report generated: ${newRep.name}`);
-
-      // If format was CSV, automatically trigger CSV download
-      if (newRep.format === 'CSV') {
-        this.reportService.downloadCSV(newRep);
-      }
-    }, 400);
+    const newRep = this.reportService.generateReport(
+      this.selectedType,
+      this.selectedPeriod,
+      this.selectedFormat,
+      this.customStartDate,
+      this.customEndDate,
+      this.transactions
+    );
+    this.activeReport = newRep;
+    this.isGenerating = false;
+    this.showToast(`Report generated: ${newRep.name}`);
   }
 
   selectPreviewReport(report: GeneratedReport): void {
@@ -1065,7 +1058,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       this.showToast('CSV downloaded successfully.');
     } else {
       this.reportService.printOrSavePDF();
-      this.showToast('Opening print dialog for PDF export.');
+      this.showToast('Use the print dialog to save this exact report as PDF.');
     }
   }
 

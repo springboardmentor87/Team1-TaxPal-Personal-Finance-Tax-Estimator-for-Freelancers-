@@ -98,6 +98,7 @@ const getMonthlyReport = async (
             startDate,
             endDate
         );
+    const transactions = await ReportModel.getTransactions(userId, startDate, endDate);
 
 
     let income = 0;
@@ -172,7 +173,8 @@ const getMonthlyReport = async (
 
         },
 
-        categories: categories
+        categories: categories,
+        transactions: transactions
 
     };
 };
@@ -252,6 +254,7 @@ const getQuarterlyReport = async (
             startDate,
             endDate
         );
+    const transactions = await ReportModel.getTransactions(userId, startDate, endDate);
 
 
     let income = 0;
@@ -326,7 +329,8 @@ const getQuarterlyReport = async (
 
         },
 
-        categories: categories
+        categories: categories,
+        transactions: transactions
 
     };
 };

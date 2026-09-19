@@ -72,7 +72,24 @@ const loginUser = async (req, res) => {
     }
 };
 
+const resetPassword = async (req, res) => {
+    try {
+        await authService.resetPassword(req.body);
+        return res.status(200).json({
+            success: true,
+            message: "Password reset successfully"
+        });
+    } catch (error) {
+        console.error("Password reset error:", error.message);
+        return res.status(400).json({
+            success: false,
+            message: error.message || "Unable to reset password"
+        });
+    }
+};
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    resetPassword
 };

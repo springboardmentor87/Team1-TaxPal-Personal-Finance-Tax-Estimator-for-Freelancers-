@@ -194,19 +194,26 @@ import { AuthService } from './auth.service';
           </div>
           <div class="modal-body">
             <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-              Enter your registered email address below and we'll send you a password reset link.
+              Enter your registered email address and choose a new password.
             </p>
             <div *ngIf="forgotSuccess()" class="alert alert-success">
-              <span>A password reset link has been sent to your email address.</span>
+              <span>{{ forgotMessage }}</span>
+            </div>
+            <div *ngIf="!forgotSuccess() && forgotMessage" class="alert alert-error">
+              <span>{{ forgotMessage }}</span>
             </div>
             <div class="form-group" *ngIf="!forgotSuccess()">
               <label class="form-label" for="resetEmail">Email Address</label>
               <input type="email" id="resetEmail" [(ngModel)]="resetEmail" class="form-input" placeholder="e.g. alex@example.com">
             </div>
+            <div class="form-group" *ngIf="!forgotSuccess()">
+              <label class="form-label" for="newPassword">New Password</label>
+              <input type="password" id="newPassword" [(ngModel)]="newPassword" class="form-input" placeholder="At least 8 characters">
+            </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" (click)="closeForgotPassword()">Close</button>
-            <button class="btn btn-primary" *ngIf="!forgotSuccess()" (click)="submitForgotPassword()" [disabled]="!resetEmail">Send Reset Link</button>
+            <button class="btn btn-primary" *ngIf="!forgotSuccess()" (click)="submitForgotPassword()" [disabled]="!resetEmail || !newPassword">Reset Password</button>
           </div>
         </div>
       </div>
@@ -606,6 +613,8 @@ export class LoginComponent implements OnInit {
   showForgotModal = signal(false);
   forgotSuccess = signal(false);
   resetEmail = '';
+  newPassword = '';
+  forgotMessage = '';
 
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -643,6 +652,8 @@ export class LoginComponent implements OnInit {
     this.showForgotModal.set(true);
     this.forgotSuccess.set(false);
     this.resetEmail = '';
+    this.newPassword = '';
+    this.forgotMessage = '';
   }
 
   closeForgotPassword(): void {
@@ -650,8 +661,14 @@ export class LoginComponent implements OnInit {
   }
 
   submitForgotPassword(): void {
-    if (this.resetEmail) {
-      this.forgotSuccess.set(true);
-    }
+    if (!this.resetEmail || !this.newPassword) return;
+    this.authService.resetPassword(this.resetEmail, this.newPassword).subscribe(result => {
+      if (result.success) {
+        this.forgotMessage = 'Password reset successfully. You can now sign in.';
+        this.forgotSuccess.set(true);
+      } else {
+        this.forgotMessage = result.error || 'Unable to reset password';
+      }
+    });
   }
 }

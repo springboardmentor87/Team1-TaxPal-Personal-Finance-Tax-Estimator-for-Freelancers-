@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -81,7 +81,7 @@ import { User } from '../transactions/transaction.model';
               </div>
 
               <form
-                (ngSubmit)="onCalculate()"
+                (ngSubmit)="onCalculate($event)"
                 class="tax-form">
 
                 <div class="form-row">
@@ -764,12 +764,12 @@ export class TaxEstimatorComponent implements OnInit {
     country: 'India',
     state: '',
     filingStatus: 'single',
-    quarter: 'Q2',
-    grossIncome: 12000,
-    businessExpenses: 1500,
-    retirementContributions: 1000,
-    healthInsurancePremiums: 500,
-    homeOfficeDeduction: 300
+    quarter: 'Q1',
+    grossIncome: null,
+    businessExpenses: null,
+    retirementContributions: null,
+    healthInsurancePremiums: null,
+    homeOfficeDeduction: null
   };
 
   result: TaxEstimateResult | null = null;
@@ -778,7 +778,8 @@ export class TaxEstimatorComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private taxService: TaxEstimatorService
+    private taxService: TaxEstimatorService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -789,7 +790,6 @@ export class TaxEstimatorComponent implements OnInit {
 
     this.loadReminders();
 
-    this.onCalculate();
   }
 
   toggleSidebar(): void {
@@ -815,16 +815,27 @@ export class TaxEstimatorComponent implements OnInit {
       : '$';
   }
 
-  onCalculate(): void {
-
+  onCalculate(event?: Event): void {
+    event?.preventDefault();
+    const calculationParams: TaxCalculationParams = {
+      ...this.params,
+      grossIncome: this.params.grossIncome ?? 0,
+      businessExpenses: this.params.businessExpenses ?? 0,
+      retirementContributions: this.params.retirementContributions ?? 0,
+      healthInsurancePremiums: this.params.healthInsurancePremiums ?? 0,
+      homeOfficeDeduction: this.params.homeOfficeDeduction ?? 0
+    };
+    this.result = null;
     this.taxService
-      .calculateTax(this.params)
+      .calculateTax(calculationParams)
       .subscribe({
         next: (res) => {
           this.result = res;
+          this.changeDetectorRef.detectChanges();
         },
         error: (error) => {
           console.error('Tax calculation error:', error);
+          this.changeDetectorRef.detectChanges();
         }
       });
   }
